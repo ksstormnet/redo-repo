@@ -1,0 +1,6 @@
+# Ignore trash directories
+.Trash-1000/
+
+# Ignore lost+found directory
+lost+found/
+
