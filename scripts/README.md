@@ -1,146 +1,164 @@
- Server to KDE Modular Installation Scripts
+# Installation Scripts
 
-## Overview
-This set of scripts provides a modular approach to installing KDE Plasma over Ubuntu Server with a focus on development work, local LLM inference with an RTX 3090, and professional audio capabilities. Each script handles a specific aspect of the system configuration, allowing for easier maintenance, troubleshooting, and customization.
+This directory contains the core scripts for installing and configuring the Kubuntu system. These scripts follow a modular design, with each script handling a specific aspect of the system setup.
 
-## Script Sequence
+## Master Installer
 
-### 0. Master Installer (`00-master-installer.sh`)
-- Provides a menu-driven interface to run all scripts
-- Allows for selective installation of components
-- Offers preset installation profiles (full, core, developer)
-- Handles script sequencing and reboot prompts
+### [master-installer-script.sh](master-installer-script.sh)
 
-### 1. Core System Setup (`01-core-system-setup.sh`)
-- Installs essential system utilities and tools
-- Sets up base system components and performance tools
-- Configures LVM tools and low-latency kernel
+- **Purpose**: Manages the execution of all installation scripts in the correct sequence
+- **Features**:
+  - Menu-driven interface for selecting which scripts to run
+  - Progress tracking with completion flags
+  - Automatic restoration of critical backups
+  - Managed reboots at appropriate points
+  - Error handling and recovery options
+- **Usage**: `sudo ./master-installer-script.sh`
 
-### 2. Audio System Setup (`02-audio-system-setup.sh`)
-- Installs PipeWire audio system (modern replacement for PulseAudio)
-- Configures audio utilities and real-time privileges
-- Sets up IRQ priorities for optimal audio performance
+## Configuration Management
 
-### 3. NVIDIA RTX Setup (`03-nvidia-rtx-setup.sh`)
-- Installs optimized NVIDIA drivers for RTX 3090
-- Sets up CUDA and ML support
-- Configures persistence mode and optimizations for LLM inference
+### [config-management-functions.sh](config-management-functions.sh)
 
-### 4. KDE Desktop Installation (`04-kde-desktop-install.sh`)
-- Installs KDE Plasma desktop environment
-- Configures desktop settings and removes unwanted applications
-- Sets up additional KDE applications and customizations
+- **Purpose**: Provides centralized functions for managing configuration files
+- **Features**:
+  - Handles symlinks between original locations and Git repository
+  - Manages pre-installation and post-installation configurations
+  - Automatically commits changes to the configuration repository
+  - Provides consistent interface for all scripts
+- **Documentation**: [README-config-management.md](README-config-management.md)
 
-### 5. Development Tools Setup (`05-development-tools-setup.sh`)
-- Installs a lightweight set of development tools for WordPress plugin development
-- Sets up PHP 8.4 with necessary extensions
-- Configures Node.js, Docker, and other essential development components
+### [restore-critical-backups.sh](restore-critical-backups.sh)
 
-### 6. Code Editors Setup (`06-code-editors-setup.sh`)
-- Installs VS Code and Zed Editor
-- Sets up additional text editors (Vim, Kate)
-- Configures editor settings
+- **Purpose**: Extracts and prepares backup files for use by installation scripts
+- **Features**:
+  - Extracts archives from `/restart/prep/backups`
+  - Creates a configuration mapping file for other scripts
+  - Sets up directories and symlinks for easy access to configurations
+  - Provides validation of extracted configurations
+- **Usage**: Run before other installation scripts or via master installer
 
-### 7. ZSH Shell Setup (`07-zsh-shell-setup.sh`)
-- Installs ZSH with plugins and Starship prompt
-- Configures ZSH as the default shell
-- Sets up essential terminal utilities
+## Sequential Installation Scripts
 
-### 8. Specialized Software (`08-specialized-software.sh`)
-- Installs audio production software
-- Sets up virtualization with VirtualBox
-- Configures graphics, design, office, and productivity tools
+### Core System Setup
 
-### 9. Browsers Setup (`09-browsers-setup.sh`)
-- Installs Brave Browser, Microsoft Edge, and Firefox
-- Provides information about Zen Browser (manual installation)
+#### [00-initial-setup.sh](00-initial-setup.sh)
 
-### 10. Ollama LLM Setup (`10-ollama-llm-setup.sh`)
-- Installs Ollama for local LLM inference
-- Optimizes configuration for RTX 3090
-- Sets up model directory and tests the installation
+- **Purpose**: Prepares the system for installation and sets up core directories
+- **Key Actions**: Updates package lists, installs dependencies, creates function libraries, restores Git configuration
 
-### 11. Email Client Setup (`11-email-client-setup.sh`)
-- Installs Mailspring email client
-- Configures KDE integration
+#### [01-core-system-setup.sh](01-core-system-setup.sh)
 
-### 12. Terminal Enhancements (`12-terminal-enhancements.sh`)
-- Installs additional terminal utilities
-- Sets up monitoring and system management tools
-- Configures Tmux with sensible defaults
+- **Purpose**: Installs essential system components and base utilities
+- **Key Actions**: Installs system utilities, configures LVM tools, sets up user profile
 
-### 13. AppImage Setup (`13-appimage-setup.sh`)
-- Sets up AppImage support
-- Creates directory structure and helper scripts
-- Downloads and configures various AppImage applications
+#### [02-audio-system-setup.sh](02-audio-system-setup.sh)
 
-### 14. KDE Settings Configuration (`14-kde-settings-configuration.sh`)
-- Configures additional KDE settings
-- Sets up Meta key shortcuts
-- Optimizes KDE rendering performance with OpenGL
+- **Purpose**: Configures PipeWire audio system with optimizations for professional audio
+- **Key Actions**: Installs PipeWire, sets up real-time privileges, configures RTIRQ
 
-### 15. Configuration Backups (`15-configuration-backups.sh`)
-- Creates directory structure for configuration backups
-- Sets up documentation for backup/restore processes
-- Prepares the system for user configuration management
+#### [03-nvidia-rtx-setup.sh](03-nvidia-rtx-setup.sh)
 
-### 16. Final Cleanup (`16-final-cleanup.sh`)
-- Removes unnecessary packages and dependencies
-- Cleans package and system caches
-- Creates an installation summary document
-- Performs final system optimizations
+- **Purpose**: Installs NVIDIA drivers optimized for RTX 3090 and ML/LLM inference
+- **Key Actions**: Sets up CUDA, configures persistence mode, applies optimizations for LLM inference
 
-## Usage
+#### [04-kde-desktop-install.sh](04-kde-desktop-install.sh)
 
-You have two options for running these scripts:
+- **Purpose**: Installs KDE Plasma desktop environment with optimized settings
+- **Key Actions**: Installs Kubuntu desktop, removes unwanted applications, restores KDE configurations
 
-### Option 1: Menu-Driven Installation
+### Development Environment
 
-Run the master script for a guided, interactive installation:
+#### [05-development-tools-setup.sh](05-development-tools-setup.sh)
 
-```bash
-sudo bash 00-master-installer.sh
-```
+- **Purpose**: Sets up development tools for various programming languages
+- **Key Actions**: Installs PHP, Node.js, Docker, and development utilities
 
-This provides a menu with several options:
-- Install individual components
-- Install all components sequentially
-- Install just the core components (1-4)
-- Install the developer toolkit (1-7)
+#### [06-global-dev-packages.sh](06-global-dev-packages.sh)
 
-### Option 2: Manual Installation
+- **Purpose**: Installs global development packages for Node.js and PHP
+- **Key Actions**: Sets up global packages, linters, formatters, and development utilities
 
-Each script can be run independently:
+#### [07-code-editors-setup.sh](07-code-editors-setup.sh)
 
-```bash
-sudo bash 01-core-system-setup.sh
-sudo bash 02-audio-system-setup.sh
-# ... and so on
-```
+- **Purpose**: Installs and configures code editors
+- **Key Actions**: Sets up VS Code, Zed, Kate, and terminal editors
 
-A reboot is recommended after scripts 1-4 and again after all scripts are completed.
+#### [08-zsh-shell-setup.sh](08-zsh-shell-setup.sh)
 
-## Customization
+- **Purpose**: Configures ZSH shell with plugins and enhancements
+- **Key Actions**: Installs ZSH, sets up Starship prompt, configures shell utilities
 
-These scripts are designed to be modular, making it easy to:
-- Skip certain components by not running specific scripts
-- Modify individual scripts to add or remove packages as needed
-- Change configuration settings within each domain
+### Application Installation
 
-## Requirements
+#### [09-specialized-software.sh](09-specialized-software.sh)
 
-- A clean Ubuntu Server installation
-- Internet connection for package downloads
-- RTX 3090 GPU (for optimal LLM performance)
-- Sufficient disk space (at least 50GB recommended)
+- **Purpose**: Installs specialized software for various tasks
+- **Key Actions**: Sets up audio production, graphics, design, and productivity software
 
-## Post-Installation
+#### [10-browsers-setup.sh](10-browsers-setup.sh)
 
-After running all scripts, you'll have a fully configured KDE desktop environment with:
-- Development tools ready for WordPress plugin development
-- Docker set up for containerized services
-- Optimized GPU drivers for AI/ML workloads
-- Professional audio capabilities with low-latency performance
-- A comprehensive set of applications for productivity and creativity
-- Configuration backup directories for storing your settings
-- A detailed installation summary for future reference
+- **Purpose**: Installs and configures web browsers
+- **Key Actions**: Sets up Brave, Edge, Firefox, and profile management
+
+#### [11-ollama-llm-setup.sh](11-ollama-llm-setup.sh)
+
+- **Purpose**: Installs Ollama for local LLM inference with RTX 3090 optimizations
+- **Key Actions**: Configures models directory, optimizes for GPU, pulls models
+
+#### [12-email-client-setup.sh](12-email-client-setup.sh)
+
+- **Purpose**: Sets up Mailspring email client
+- **Key Actions**: Installs Mailspring and restores configurations
+
+#### [13-terminal-enhancements.sh](13-terminal-enhancements.sh)
+
+- **Purpose**: Installs additional terminal utilities and enhancements
+- **Key Actions**: Sets up monitoring tools, file managers, and system utilities
+
+#### [14-appimage-setup.sh](14-appimage-setup.sh)
+
+- **Purpose**: Configures AppImage support and management
+- **Key Actions**: Creates directories and helper scripts, downloads common AppImages
+
+### Final Configuration
+
+#### [15-kde-settings-configuration.sh](15-kde-settings-configuration.sh)
+
+- **Purpose**: Applies additional KDE settings and customizations
+- **Key Actions**: Configures keyboard, power management, and file manager settings
+
+#### [16-configuration-backups.sh](16-configuration-backups.sh)
+
+- **Purpose**: Sets up an integrated configuration management strategy
+- **Key Actions**: Creates backup directories, syncs with Git repository, documents configurations
+
+#### [17-final-cleanup.sh](17-final-cleanup.sh)
+
+- **Purpose**: Performs system cleanup and generates installation summary
+- **Key Actions**: Removes unnecessary packages, cleans caches, creates summary document
+
+#### [18-system-tuning-tweaks.sh](18-system-tuning-tweaks.sh)
+
+- **Purpose**: Applies advanced system tuning for optimal performance
+- **Key Actions**: Configures kernel parameters, I/O schedulers, and system optimizations
+
+#### [19-networking-tweaks.sh](19-networking-tweaks.sh)
+
+- **Purpose**: Sets up networking enhancements and configurations
+- **Key Actions**: Configures SMB/CIFS, DNS, browser settings, and network optimizations
+
+## Post-Installation Utilities
+
+See [post-install/README.md](post-install/README.md) for details on post-installation utilities and configurations.
+
+## Usage Notes
+
+- Scripts should be run in the numbered sequence, as many have dependencies on earlier scripts
+- Most scripts require root privileges and should be run with `sudo`
+- The master installer is the recommended way to run these scripts
+- Scripts can be customized by editing variables at the beginning of each file
+- Each script creates appropriate log files in `/var/log/kde-installer/`
+
+---
+
+*Back to [Main README](../README.md) | Previous: [LVM Setup](../bare-to-lvm/README.md) | Next: [Post-Install Utilities](post-install/README.md)*
