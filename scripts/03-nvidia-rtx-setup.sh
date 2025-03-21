@@ -104,9 +104,9 @@ section "Installing NVIDIA Drivers for RTX 3090"
 
 # Install recommended NVIDIA driver for RTX 3090
 install_packages "NVIDIA Drivers" \
-    nvidia-driver-535 \
-    nvidia-utils-535 \
-    libnvidia-common-535 \
+    nvidia-driver-545 \
+    nvidia-utils-545 \
+    libnvidia-common-545 \
     nvidia-settings
 
 # Install NVIDIA CUDA toolkit

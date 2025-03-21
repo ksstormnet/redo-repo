@@ -4,11 +4,11 @@ This checklist guides you through the complete system rebuild process from backu
 
 ## Initial Preparation
 
-- [ ] Connect external backup drive to current system
-- [ ] Run backup preparation script: `sudo ./prep-scripts/backup_critical_data.sh`
+- [X] Connect external backup drive to current system
+- [X] Run backup preparation script: `./prep-scripts/backup_critical_data.sh`
 - [ ] Verify backup completion and integrity in `/restart/prep/backups`
-- [ ] Download Ubuntu Server 24.04 ISO
-- [ ] Create bootable USB installation media
+- [X] Download Ubuntu Server 24.04 ISO
+- [X] Create bootable USB installation media
 - [ ] Copy scripts directory to a separate USB drive
 - [ ] Shutdown current system
 

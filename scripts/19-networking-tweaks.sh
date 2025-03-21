@@ -114,7 +114,7 @@ else
     # Create a basic smb.conf file
     cat > /etc/samba/smb.conf << EOF
 [global]
-   workgroup = WORKGROUP
+   workgroup = NEWBERRY
    server string = %h server
    dns proxy = no
    log file = /var/log/samba/log.%m
@@ -147,14 +147,14 @@ else
    valid users = %S
 
 # Public share example (commented out by default)
-#[Public]
-#   comment = Public Shared Folder
-#   path = /data/public
-#   browseable = yes
-#   read only = no
-#   guest ok = no
-#   create mask = 0755
-#   directory mask = 0755
+[Public]
+   comment = Public Shared Folder
+   path = /data/public
+   browseable = yes
+   read only = no
+   guest ok = no
+   create mask = 0755
+   directory mask = 0755
 EOF
 fi
 
@@ -676,10 +676,31 @@ else
   "ForceGoogleSafeSearch": true,
   "ForceYouTubeRestrict": "Strict",
   "URLBlocklist": [
-    "chrome://settings/content/contentSettings",
-    "chrome://settings/searchEngines"
+    "chrome://settings/content/contentSettings"
   ],
-  "BrowserSwitcherEnabled": false
+  "BrowserSwitcherEnabled": false,
+  "DefaultSearchProviderEnabled": true,
+  "DefaultSearchProviderName": "Kagi",
+  "DefaultSearchProviderSearchURL": "https://kagi.com/search?q={searchTerms}",
+  "DefaultSearchProviderSuggestURL": "https://kagi.com/api/autosuggest?q={searchTerms}",
+  "DefaultSearchProviderIconURL": "https://kagi.com/favicon.ico",
+  "DefaultSearchProviderKeyword": "kagi",
+  "DefaultSearchProviderAlternateURLs": ["https://kagi.com/search?q={searchTerms}"],
+  "DefaultSearchProviderEncodings": ["UTF-8"],
+  "DefaultSearchProviderImageURL": "https://kagi.com/image?q={searchTerms}",
+  "DefaultSearchProviderImageURLPostParams": "",
+  "DefaultSearchProviderNewTabURL": "https://kagi.com",
+  "SearchSuggestEnabled": true,
+  "HideWebStoreIcon": false,
+  "DeveloperToolsAvailability": 1,
+  "OverrideSecurityRestrictionsOnInsecureOrigin": false,
+  "ShowFullUrlsInAddressBar": true,
+  "AlternateErrorPagesEnabled": true,
+  "HomepageLocation": "https://kagi.com",
+  "HomepageIsNewTabPage": false,
+  "NewTabPageLocation": "https://kagi.com",
+  "RestoreOnStartup": 5,
+  "RestoreOnStartupURLs": ["https://kagi.com"]
 }
 EOF
 
@@ -689,10 +710,31 @@ EOF
   "ForceGoogleSafeSearch": true,
   "ForceYouTubeRestrict": "Strict",
   "URLBlocklist": [
-    "edge://settings/content/contentSettings",
-    "edge://settings/searchEngines"
+    "edge://settings/content/contentSettings"
   ],
-  "BrowserSwitcherEnabled": false
+  "BrowserSwitcherEnabled": false,
+  "DefaultSearchProviderEnabled": true,
+  "DefaultSearchProviderName": "Kagi",
+  "DefaultSearchProviderSearchURL": "https://kagi.com/search?q={searchTerms}",
+  "DefaultSearchProviderSuggestURL": "https://kagi.com/api/autosuggest?q={searchTerms}",
+  "DefaultSearchProviderIconURL": "https://kagi.com/favicon.ico",
+  "DefaultSearchProviderKeyword": "kagi",
+  "DefaultSearchProviderAlternateURLs": ["https://kagi.com/search?q={searchTerms}"],
+  "DefaultSearchProviderEncodings": ["UTF-8"],
+  "DefaultSearchProviderImageURL": "https://kagi.com/image?q={searchTerms}",
+  "DefaultSearchProviderImageURLPostParams": "",
+  "DefaultSearchProviderNewTabURL": "https://kagi.com",
+  "SearchSuggestEnabled": true,
+  "HideWebStoreIcon": false,
+  "DeveloperToolsAvailability": 1,
+  "OverrideSecurityRestrictionsOnInsecureOrigin": false,
+  "ShowFullUrlsInAddressBar": true,
+  "AlternateErrorPagesEnabled": true,
+  "HomepageLocation": "https://kagi.com",
+  "HomepageIsNewTabPage": false,
+  "NewTabPageLocation": "https://kagi.com",
+  "RestoreOnStartup": 5,
+  "RestoreOnStartupURLs": ["https://kagi.com"]
 }
 EOF
 
@@ -707,7 +749,34 @@ EOF
     "BlockAboutConfig": true,
     "WebsiteFilter": {
       "Block": ["https://www.youtube.com/watch?*&safety_mode=false", "https://www.youtube.com/watch?*?safety_mode=false"]
-    }
+    },
+    "SearchEngines": {
+      "Default": "Kagi",
+      "PreventInstalls": true,
+      "Add": [
+        {
+          "Name": "Kagi",
+          "URLTemplate": "https://kagi.com/search?q={searchTerms}",
+          "Method": "GET",
+          "IconURL": "https://kagi.com/favicon.ico",
+          "SuggestURLTemplate": "https://kagi.com/api/autosuggest?q={searchTerms}",
+          "Alias": "kagi"
+        }
+      ],
+      "Remove": ["Google", "Bing", "Amazon.com", "eBay", "Twitter", "Wikipedia"]
+    },
+    "OverrideFirstRunPage": "https://kagi.com",
+    "OverridePostUpdatePage": "https://kagi.com",
+    "Homepage": {
+      "URL": "https://kagi.com",
+      "Locked": true
+    },
+    "DisableTelemetry": true,
+    "DisableFirefoxStudies": true,
+    "DisablePocket": true,
+    "NoDefaultBookmarks": true,
+    "DisplayBookmarksToolbar": true,
+    "DontCheckDefaultBrowser": true
   }
 }
 EOF
@@ -718,10 +787,31 @@ EOF
   "ForceGoogleSafeSearch": true,
   "ForceYouTubeRestrict": "Strict",
   "URLBlocklist": [
-    "brave://settings/content/contentSettings",
-    "brave://settings/searchEngines"
+    "brave://settings/content/contentSettings"
   ],
-  "BrowserSwitcherEnabled": false
+  "BrowserSwitcherEnabled": false,
+  "DefaultSearchProviderEnabled": true,
+  "DefaultSearchProviderName": "Kagi",
+  "DefaultSearchProviderSearchURL": "https://kagi.com/search?q={searchTerms}",
+  "DefaultSearchProviderSuggestURL": "https://kagi.com/api/autosuggest?q={searchTerms}",
+  "DefaultSearchProviderIconURL": "https://kagi.com/favicon.ico",
+  "DefaultSearchProviderKeyword": "kagi",
+  "DefaultSearchProviderAlternateURLs": ["https://kagi.com/search?q={searchTerms}"],
+  "DefaultSearchProviderEncodings": ["UTF-8"],
+  "DefaultSearchProviderImageURL": "https://kagi.com/image?q={searchTerms}",
+  "DefaultSearchProviderImageURLPostParams": "",
+  "DefaultSearchProviderNewTabURL": "https://kagi.com",
+  "SearchSuggestEnabled": true,
+  "HideWebStoreIcon": false,
+  "DeveloperToolsAvailability": 1,
+  "OverrideSecurityRestrictionsOnInsecureOrigin": false,
+  "ShowFullUrlsInAddressBar": true,
+  "AlternateErrorPagesEnabled": true,
+  "HomepageLocation": "https://kagi.com",
+  "HomepageIsNewTabPage": false,
+  "NewTabPageLocation": "https://kagi.com",
+  "RestoreOnStartup": 5,
+  "RestoreOnStartupURLs": ["https://kagi.com"]
 }
 EOF
 fi
@@ -730,6 +820,8 @@ echo "✓ Browser safe search configuration completed"
 echo "  - Google SafeSearch enforced for Chrome, Edge, Firefox, and Brave"
 echo "  - YouTube restricted mode enforced"
 echo "  - Incognito/Private browsing allowed for troubleshooting cache and cookie issues"
+echo "  - Kagi set as default search engine for all browsers"
+echo "  - Browser warnings about non-default search engines overridden"
 
 # ======================================================================
 # 4. Network Performance Optimizations

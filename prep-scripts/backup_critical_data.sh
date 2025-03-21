@@ -32,17 +32,22 @@ log "Backing up home directory configuration files"
 mkdir -p "${BACKUP_PATH}/home_configs"
 
 # SSH keys with encryption
-if [[ -d ~/.ssh ]]; then
+if [[ -d /home/scott/.ssh ]]; then
     log "Backing up SSH keys with encryption"
     mkdir -p "${BACKUP_PATH}/ssh_backup"
-    cp -r ~/.ssh "${BACKUP_PATH}/ssh_backup/"
+    
+    # Use sudo to copy SSH files while preserving permissions
+    sudo cp -p -r /home/scott/.ssh/. "${BACKUP_PATH}/ssh_backup/"
+    # Fix ownership of the copied files to match the backup directory
+    sudo chown -R "$(id -u):$(id -g)" "${BACKUP_PATH}/ssh_backup/"
     
     # Create encrypted archive of SSH config
     ENCRYPTION_PASSWORD="Storm!Stream12"
     SSH_ARCHIVE="${BACKUP_PATH}/ssh_encrypted_${TIMESTAMP}.tar.gz.gpg"
     
-    # Create tar archive first
-    tar -czf "${BACKUP_PATH}/ssh_backup_temp.tar.gz" -C "${BACKUP_PATH}" ssh_backup
+    # Create tar archive first, using sudo to ensure access to all files
+    sudo tar -czf "${BACKUP_PATH}/ssh_backup_temp.tar.gz" -C "${BACKUP_PATH}" ssh_backup
+    sudo chown "$(id -u):$(id -g)" "${BACKUP_PATH}/ssh_backup_temp.tar.gz"
     
     # Encrypt the archive with the provided password
     gpg --batch --yes --passphrase "${ENCRYPTION_PASSWORD}" \
@@ -50,27 +55,27 @@ if [[ -d ~/.ssh ]]; then
         -o "${SSH_ARCHIVE}" \
         --symmetric "${BACKUP_PATH}/ssh_backup_temp.tar.gz"
     
-    # Remove the unencrypted files
-    rm -rf "${BACKUP_PATH}/ssh_backup"
-    rm "${BACKUP_PATH}/ssh_backup_temp.tar.gz"
+    # Remove the unencrypted files with sudo
+    sudo rm -rf "${BACKUP_PATH}/ssh_backup"
+    sudo rm -f "${BACKUP_PATH}/ssh_backup_temp.tar.gz"
     
     log "SSH keys backed up and encrypted to ${SSH_ARCHIVE}"
 fi
 
 # Git config
-if [[ -f ~/.gitconfig ]]; then
-    cp ~/.gitconfig "${BACKUP_PATH}/home_configs/"
+if [[ -f /home/scott/.gitconfig ]]; then
+    cp /home/scott/.gitconfig "${BACKUP_PATH}/home_configs/"
     log "Git configuration backed up"
 fi
 
 # Nano configuration
-if [[ -f ~/.nanorc ]]; then
-    cp ~/.nanorc "${BACKUP_PATH}/home_configs/"
+if [[ -f /home/scott/.nanorc ]]; then
+    cp /home/scott/.nanorc "${BACKUP_PATH}/home_configs/"
     log ".nanorc backed up"
 fi
 
 # Shell config files
-for file in ~/.bashrc ~/.bash_profile ~/bash_aliases ~/.profile ~/.zshrc ~/.zsh_history; do
+for file in /home/scott/.bashrc /home/scott/.bash_profile /home/scott/bash_aliases /home/scott/.profile /home/scott/.zshrc /home/scott/.zsh_history; do
     if [[ -f "${file}" ]]; then
         cp "${file}" "${BACKUP_PATH}/home_configs/"
         basename_result=$(basename "${file}") || true
@@ -79,22 +84,22 @@ for file in ~/.bashrc ~/.bash_profile ~/bash_aliases ~/.profile ~/.zshrc ~/.zsh_
 done
 
 # Backup files sourced in .bashrc
-if [[ -f ~/.bashrc ]]; then
+if [[ -f /home/scott/.bashrc ]]; then
     log "Checking .bashrc for sourced files"
     mkdir -p "${BACKUP_PATH}/bashrc_sourced"
     
     # Find all sourced files in .bashrc
     # Use || true to avoid masking return values
-    sourced_files=$(grep -E 'source |^\. ' ~/.bashrc | grep -v "${HOME}/bin\|/usr/local/bin" | awk '{print $2}' | sed "s|~|${HOME}|g") || true
+    sourced_files=$(grep -E 'source |^\. ' /home/scott/.bashrc | grep -v "/home/scott/bin\|/usr/local/bin" | awk '{print $2}' | sed "s|~|/home/scott|g") || true
     
     if [[ -n "${sourced_files}" ]]; then
         while read -r file; do
             # Expand environment variables
-            expanded_file=$(eval echo "${file}") || true
+            expanded_file="${file/\${HOME}/\/home\/scott}" || true
             
             if [[ -f "${expanded_file}" ]]; then
                 # Create directory structure
-                target_dir="${BACKUP_PATH}/bashrc_sourced/$(dirname "${expanded_file}" | sed "s|^${HOME}|home|")" || true
+                target_dir="${BACKUP_PATH}/bashrc_sourced/$(dirname "${expanded_file}" | sed "s|^/home/scott|home|")" || true
                 mkdir -p "${target_dir}"
                 
                 # Copy the file
@@ -116,24 +121,24 @@ find_additional_configs() {
     log "Scanning for additional configuration files..."
     
     # Look for other dot directories in home that might contain configs
-    for dotdir in ~/.[a-zA-Z]*; do
+    for dotdir in /home/scott/.[a-zA-Z]*; do
         # Skip already included directories and those we want to exclude
-        if [[ -d "${dotdir}" ]] && 
-           [[ "${dotdir}" != "${HOME}/.cache" ]] && 
-           [[ "${dotdir}" != "${HOME}/.local/share/Trash" ]] && 
-           [[ "${dotdir}" != "${HOME}/.mozilla" ]] && 
-           [[ "${dotdir}" != "${HOME}/.config/google-chrome" ]] && 
-           [[ "${dotdir}" != "${HOME}/.config/chromium" ]] &&
-           [[ "${dotdir}" != "${HOME}/.config/BraveSoftware" ]] &&
-           [[ "${dotdir}" != "${HOME}/.config/microsoft-edge" ]] &&
-           [[ ! "${dotdir}" == *"kde"* ]] &&
+        # Skip already included directories and those we want to exclude
+        if [[ -d "${dotdir}" ]] && \
+           [[ "${dotdir}" != "/home/scott/.cache" ]] && \
+           [[ "${dotdir}" != "/home/scott/.local/share/Trash" ]] && \
+           [[ "${dotdir}" != "/home/scott/.mozilla" ]] && \
+           [[ "${dotdir}" != "/home/scott/.config/google-chrome" ]] && \
+           [[ "${dotdir}" != "/home/scott/.config/chromium" ]] && \
+           [[ "${dotdir}" != "/home/scott/.config/BraveSoftware" ]] && \
+           [[ "${dotdir}" != "/home/scott/.config/microsoft-edge" ]] && \
            [[ ! "${dotdir}" == *"plasma"* ]]; then
             
             # Check if not already in our config paths
             local already_included=false
             for path in "${CONFIG_PATHS[@]}"; do
                 local expanded_path
-                expanded_path=$(eval echo "${path}") || true
+                expanded_path="${path/\~/\/home\/scott}" || true
                 if [[ "${dotdir}" == "${expanded_path}" || "${dotdir}" == "${expanded_path}/"* ]]; then
                     already_included=true
                     break
@@ -161,16 +166,16 @@ find_additional_configs() {
     local config_paths
     config_paths=$(grep -r --include="*.sh" "\.config" /documents/ 2>/dev/null | \
                   grep -v "KDE\|kde\|plasma\|firefox\|chrome\|browser" | \
-                  grep -o -E "${HOME}/\.config/[a-zA-Z0-9_/-]+" | \
+                  grep -o -E "/home/scott/\.config/[a-zA-Z0-9_/-]+" | \
                   sort | uniq) || true
     
     if [[ -n "${config_paths}" ]]; then
         while read -r config_path; do
             local expanded_path
-            expanded_path=$(eval echo "${config_path}") || true
+            expanded_path="${config_path}" || true
             if [[ -e "${expanded_path}" ]]; then
                 local rel_path
-                rel_path=${expanded_path//${HOME}/home}
+                rel_path=${expanded_path//\/home\/scott/home}
                 local target_dir
                 target_dir="${BACKUP_PATH}/script_referenced_configs/$(dirname "${rel_path}")"
                 mkdir -p "${target_dir}"
@@ -187,92 +192,92 @@ find_additional_configs
 # List of config paths to check (excluding browser and KDE configs)
 CONFIG_PATHS=(
     # Shell and terminal configs
-    ~/.config/tmux
-    ~/.tmux.conf
-    ~/.config/starship.toml
-    ~/.zshrc
-    ~/.config/zsh
-    ~/.oh-my-zsh
+    /home/scott/.config/tmux
+    /home/scott/.tmux.conf
+    /home/scott/.config/starship.toml
+    /home/scott/.zshrc
+    /home/scott/.config/zsh
+    /home/scott/.oh-my-zsh
     
     # Editor configs
-    ~/.config/nvim
-    ~/.vimrc
-    ~/.config/micro
-    ~/.nanorc
-    ~/.config/nano
-    ~/.config/Code/User/settings.json
-    ~/.config/Code/User/keybindings.json
-    ~/.config/zed/settings.json
-    ~/.config/zed/keymap.json
+    /home/scott/.config/nvim
+    /home/scott/.vimrc
+    /home/scott/.config/micro
+    /home/scott/.nanorc
+    /home/scott/.config/nano
+    /home/scott/.config/Code/User/settings.json
+    /home/scott/.config/Code/User/keybindings.json
+    /home/scott/.config/zed/settings.json
+    /home/scott/.config/zed/keymap.json
     
     # Development tools
-    ~/.config/gh
-    ~/.config/git
-    ~/.gitconfig
-    ~/.gitignore_global
-    ~/.git-credentials
-    ~/.config/docker
-    ~/.docker
-    ~/.config/composer
-    ~/.composer
-    ~/.config/pip
-    ~/.pip
-    ~/.npmrc
-    ~/.config/configstore
-    ~/.wp-cli
-    ~/.wrangler
-    ~/.java
+    /home/scott/.config/gh
+    /home/scott/.config/git
+    /home/scott/.gitconfig
+    /home/scott/.gitignore_global
+    /home/scott/.git-credentials
+    /home/scott/.config/docker
+    /home/scott/.docker
+    /home/scott/.config/composer
+    /home/scott/.composer
+    /home/scott/.config/pip
+    /home/scott/.pip
+    /home/scott/.npmrc
+    /home/scott/.config/configstore
+    /home/scott/.wp-cli
+    /home/scott/.wrangler
+    /home/scott/.java
     
     # NodeJS and PHP configs
-    ~/.config/typescript
-    ~/.config/phpcs
-    ~/.eslintrc.json
-    ~/.prettierrc
-    ~/.config/php
+    /home/scott/.config/typescript
+    /home/scott/.config/phpcs
+    /home/scott/.eslintrc.json
+    /home/scott/.prettierrc
+    /home/scott/.config/php
     
     # Network and utility tools
-    ~/.config/remmina
-    ~/.config/filezilla
-    ~/.ssh/config
-    ~/.config/htop
-    ~/.local/share/rclone
+    /home/scott/.config/remmina
+    /home/scott/.config/filezilla
+    /home/scott/.ssh/config
+    /home/scott/.config/htop
+    /home/scott/.local/share/rclone
     
     # Audio and video configs
-    ~/.config/audacity
-    ~/.config/vlc
-    ~/.config/pipewire
-    ~/.config/wireplumber
-    ~/.config/jack
-    ~/.asoundrc
+    /home/scott/.config/audacity
+    /home/scott/.config/vlc
+    /home/scott/.config/pipewire
+    /home/scott/.config/wireplumber
+    /home/scott/.config/jack
+    /home/scott/.asoundrc
     
     # Application configs
-    ~/.config/ollama
-    ~/.config/VirtualBox
-    ~/.config/appimagelauncher
-    ~/.local/share/appimagelauncher
-    ~/.local/share/applications/*.desktop
+    /home/scott/.config/ollama
+    /home/scott/.config/VirtualBox
+    /home/scott/.config/appimagelauncher
+    /home/scott/.local/share/appimagelauncher
+    /home/scott/.local/share/applications/*.desktop
     
     # Terminal utilities
-    ~/.config/btop
-    ~/.config/ranger
-    ~/.nnnrc
-    ~/.local/bin
-    ~/bin
+    /home/scott/.config/btop
+    /home/scott/.config/ranger
+    /home/scott/.nnnrc
+    /home/scott/.local/bin
+    /home/scott/bin
     
     # AppImages and custom applications
-    ~/Apps
-    ~/Templates/Development
+    /home/scott/Apps
+    /home/scott/Templates/Development
     
     # Backup and system tools  
-    ~/config-backups
-    ~/.local/share/plasma_notes
+    /home/scott/config-backups
+    /home/scott/.local/share/plasma_notes
 )
 
 for config_path in "${CONFIG_PATHS[@]}"; do
     expanded_path=$(eval echo "${config_path}") || true
     if [[ -e "${expanded_path}" ]]; then
         # Create target directory structure
-        rel_path=${expanded_path//${HOME}/home}
+        rel_path=${expanded_path//\/home\/scott/home}
         target_dir="${BACKUP_PATH}/config_files/$(dirname "${rel_path}")"
         mkdir -p "${target_dir}"
         
@@ -288,7 +293,7 @@ mkdir -p "${BACKUP_PATH}/databases"
 
 # If MySQL/MariaDB is installed
 if command -v mysql &> /dev/null; then
-    if [[ -f ~/.my.cnf ]]; then
+    if [[ -f /home/scott/.my.cnf ]]; then
         # Store databases in a variable
         databases=$(mysql -e "SHOW DATABASES" | grep -v "Database\|information_schema\|performance_schema\|sys\|mysql") || true
         
@@ -311,7 +316,7 @@ if command -v mysql &> /dev/null; then
         fi
         
         # Copy MySQL config
-        cp "${HOME}/.my.cnf" "${BACKUP_PATH}/my.cnf"
+        cp "/home/scott/.my.cnf" "${BACKUP_PATH}/my.cnf"
     else
         log "MySQL credentials not found in ~/.my.cnf - skipping MySQL backups"
     fi
@@ -322,8 +327,8 @@ if command -v psql &> /dev/null; then
     log "Backing up PostgreSQL databases"
     
     # Check for .pgpass
-    if [[ -f ~/.pgpass ]]; then
-        cp ~/.pgpass "${BACKUP_PATH}/home_configs/"
+    if [[ -f /home/scott/.pgpass ]]; then
+        cp /home/scott/.pgpass "${BACKUP_PATH}/home_configs/"
         log ".pgpass configuration backed up"
     fi
     
@@ -351,10 +356,10 @@ fi
 
 # Backup Desktop folder - do not follow symlinks
 log "Backing up Desktop files"
-desktop_files=$(ls -A ~/Desktop 2>/dev/null) || true
-if [[ -d ~/Desktop && -n "${desktop_files}" ]]; then
+desktop_files=$(ls -A /home/scott/Desktop 2>/dev/null) || true
+if [[ -d /home/scott/Desktop && -n "${desktop_files}" ]]; then
     DESKTOP_ARCHIVE="${BACKUP_DIR}/desktop_${TIMESTAMP}.tar.gz"
-    tar --no-dereference -czf "${DESKTOP_ARCHIVE}" -C "${HOME}" Desktop
+    tar -hczf "${DESKTOP_ARCHIVE}" -C "/home/scott" Desktop
     log "Desktop files backed up to ${DESKTOP_ARCHIVE}"
 else
     log "Desktop folder does not exist or is empty, skipping"
@@ -443,9 +448,14 @@ FINAL_ARCHIVE="${BACKUP_DIR}/complete_backup_${TIMESTAMP}.tar"
 # Get the list of archives to include
 archive_list=$(find "${BACKUP_DIR}" -maxdepth 1 \( -name "*.tar.gz" -o -name "*.tar.gz.gpg" -o -name "*-db.tar.gz" \) -printf "%f\n") || true
 
-tar -cf "${FINAL_ARCHIVE}" -C "${BACKUP_DIR}" \
-    "${META_FILE##*/}" \
-    "${archive_list}"
+tar -cf "${FINAL_ARCHIVE}" -C "${BACKUP_DIR}" "${META_FILE##*/}"
+
+# Add each archive file individually to the final archive
+if [[ -n "${archive_list}" ]]; then
+    while IFS= read -r archive; do
+        tar -rf "${FINAL_ARCHIVE}" -C "${BACKUP_DIR}" "${archive}"
+    done <<< "${archive_list}"
+fi
 log "Final archive created at ${FINAL_ARCHIVE}"
 
 log "Critical data backup completed successfully"
