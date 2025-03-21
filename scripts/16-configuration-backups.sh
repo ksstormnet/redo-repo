@@ -4,6 +4,7 @@
 # This script sets up an integrated configuration management strategy
 # that works alongside a Git repository for dotfiles/configs
 # Part of the sequential Ubuntu Server to KDE conversion process
+# Modified to use restored configurations from critical backup
 
 # Exit on any error
 set -e
@@ -36,9 +37,25 @@ get_symlink_target() {
     fi
 }
 
+# Check for restored configurations
+RESTORED_CONFIGS="/restart/critical_backups/config_mapping.txt"
+RESTORED_BACKUP_TOOLS=""
+
+if [[ -f "${RESTORED_CONFIGS}" ]]; then
+    echo "Found restored configuration mapping file"
+    # shellcheck disable=SC1090
+    source "${RESTORED_CONFIGS}"
+    
+    # Check for specific backup tools configuration paths
+    if [[ -n "${GENERAL_CONFIGS_PATH}" ]] && [[ -d "${GENERAL_CONFIGS_PATH}/home/config-backups" ]]; then
+        RESTORED_BACKUP_TOOLS="${GENERAL_CONFIGS_PATH}/home/config-backups"
+        echo "Found restored backup tools at ${RESTORED_BACKUP_TOOLS}"
+    fi
+fi
+
 # Determine user home directory
-if [[ "${SUDO_USER}" ]]; then
-    USER_HOME=$(getent passwd "${SUDO_USER}" | cut -d: -f6)
+if [[ -n "${SUDO_USER}" ]]; then
+    USER_HOME=$(getent passwd "${SUDO_USER}" | cut -d: -f6) || true
     # shellcheck disable=SC2034
     ACTUAL_USER="${SUDO_USER}"
 else
@@ -95,8 +112,49 @@ mkdir -p "${BACKUP_DIR}"/{browsers,git,code-editors,email,application-state,temp
 # Create a directory for quick temporary backups (not tracked in Git)
 mkdir -p "${BACKUP_DIR}/temp"
 
+# Restore any backup scripts from the critical backups if available
+if [[ -n "${RESTORED_BACKUP_TOOLS}" ]]; then
+    echo "Restoring backup tools from critical backup..."
+    
+    # Copy any scripts from the restored backup
+    if [[ -f "${RESTORED_BACKUP_TOOLS}/check_symlinks.sh" ]]; then
+        cp -f "${RESTORED_BACKUP_TOOLS}/check_symlinks.sh" "${BACKUP_DIR}/"
+        chmod +x "${BACKUP_DIR}/check_symlinks.sh"
+        echo "✓ Restored check_symlinks.sh script"
+    fi
+    
+    if [[ -f "${RESTORED_BACKUP_TOOLS}/find_configs.sh" ]]; then
+        cp -f "${RESTORED_BACKUP_TOOLS}/find_configs.sh" "${BACKUP_DIR}/"
+        chmod +x "${BACKUP_DIR}/find_configs.sh"
+        echo "✓ Restored find_configs.sh script"
+    fi
+    
+    # Copy any other utilities that might exist
+    for script in "${RESTORED_BACKUP_TOOLS}"/*.sh; do
+        if [[ -f "${script}" ]]; then
+            script_name=$(basename "${script}")
+            if [[ "${script_name}" != "check_symlinks.sh" ]] && [[ "${script_name}" != "find_configs.sh" ]]; then
+                cp -f "${script}" "${BACKUP_DIR}/"
+                chmod +x "${BACKUP_DIR}/${script_name}"
+                echo "✓ Restored additional script: ${script_name}"
+            fi
+        fi
+    done
+    
+    # Look for backup data that might have been included
+    for dir in "${RESTORED_BACKUP_TOOLS}"/*; do
+        if [[ -d "${dir}" ]] && [[ "$(basename "${dir}")" != "temp" ]]; then
+            dir_name=$(basename "${dir}")
+            if [[ -d "${BACKUP_DIR}/${dir_name}" ]]; then
+                cp -rf "${dir}"/* "${BACKUP_DIR}/${dir_name}/"
+                echo "✓ Restored backup data for: ${dir_name}"
+            fi
+        fi
+    done
+fi
+
 # Set proper ownership
-if [[ "${SUDO_USER}" ]]; then
+if [[ -n "${SUDO_USER}" ]]; then
     chown -R "${SUDO_USER}":"${SUDO_USER}" "${BACKUP_DIR}"
 fi
 
@@ -105,8 +163,14 @@ echo "✓ Created complementary backup directories at ${BACKUP_DIR}"
 # === STAGE 4: Create Configuration Categories Map ===
 section "Creating Configuration Category Documentation"
 
-# Create a README file explaining the integrated approach
-cat > "${BACKUP_DIR}/README.md" << EOF
+# Check if README already exists in the backup directory from restored backup
+if [[ -n "${RESTORED_BACKUP_TOOLS}" ]] && [[ -f "${RESTORED_BACKUP_TOOLS}/README.md" ]]; then
+    # Use the restored README
+    cp -f "${RESTORED_BACKUP_TOOLS}/README.md" "${BACKUP_DIR}/README.md"
+    echo "✓ Restored README.md from backup"
+else
+    # Create a README file explaining the integrated approach
+    cat > "${BACKUP_DIR}/README.md" << EOF
 # Integrated Configuration Management
 
 This directory complements the Git-managed configurations at \`${REPO_DIR}\`.
@@ -164,12 +228,14 @@ In case of system reinstallation:
 2. Run the symlink creation script: \`${REPO_DIR}/create_symlinks.sh\`
 3. Manually restore non-Git backups from \`${BACKUP_DIR}\`
 EOF
+fi
 
 # === STAGE 5: Create Symlink Management Tools ===
 section "Creating Symlink Management Scripts"
 
-# Create a script to check existing configuration files
-cat > "${BACKUP_DIR}/check_symlinks.sh" << 'EOF'
+# Create a script to check existing configuration files if not already restored
+if [[ ! -f "${BACKUP_DIR}/check_symlinks.sh" ]]; then
+    cat > "${BACKUP_DIR}/check_symlinks.sh" << 'EOF'
 #!/bin/bash
 
 # check_symlinks.sh
@@ -225,8 +291,13 @@ echo "3. Create a symlink: ln -s ${REPO_DIR}/config/file ~/.config/file"
 echo "4. Commit the change: cd ${REPO_DIR} && git add config/file && git commit"
 EOF
 
-# Create a script to find configs that could be added to repo
-cat > "${BACKUP_DIR}/find_configs.sh" << 'EOF'
+    chmod +x "${BACKUP_DIR}/check_symlinks.sh"
+    echo "✓ Created check_symlinks.sh script"
+fi
+
+# Create a script to find configs that could be added to repo if not already restored
+if [[ ! -f "${BACKUP_DIR}/find_configs.sh" ]]; then
+    cat > "${BACKUP_DIR}/find_configs.sh" << 'EOF'
 #!/bin/bash
 
 # find_configs.sh
@@ -265,17 +336,18 @@ echo "3. Exclude large files or directories with frequently changing state"
 echo "4. Prioritize configs that you want to be consistent across machines"
 EOF
 
-# Make the scripts executable
-chmod +x "${BACKUP_DIR}/check_symlinks.sh"
-chmod +x "${BACKUP_DIR}/find_configs.sh"
-
-# Set proper ownership if running as sudo
-if [[ "${SUDO_USER}" ]]; then
-    chown "${SUDO_USER}":"${SUDO_USER}" "${BACKUP_DIR}/check_symlinks.sh"
-    chown "${SUDO_USER}":"${SUDO_USER}" "${BACKUP_DIR}/find_configs.sh"
+    chmod +x "${BACKUP_DIR}/find_configs.sh"
+    echo "✓ Created find_configs.sh script"
 fi
 
-echo "✓ Created symlink management scripts"
+# Set proper ownership of the scripts
+if [[ -n "${SUDO_USER}" ]]; then
+    chown "${SUDO_USER}":"${SUDO_USER}" "${BACKUP_DIR}/check_symlinks.sh"
+    chown "${SUDO_USER}":"${SUDO_USER}" "${BACKUP_DIR}/find_configs.sh"
+    chown "${SUDO_USER}":"${SUDO_USER}" "${BACKUP_DIR}/README.md"
+fi
+
+echo "✓ Created/Restored symlink management scripts"
 
 # Handle configuration files
 handle_installed_software_config "backup-tools" "${BACKUP_TOOL_FILES[@]}"
@@ -283,13 +355,79 @@ handle_installed_software_config "backup-tools" "${BACKUP_TOOL_FILES[@]}"
 # === STAGE 6: Create Repository Template Structure ===
 section "Setting Up Repository Directory Structure"
 
-# Only create template if it doesn't exist or is empty
-if [[ ! -d "${REPO_DIR}/.git" ]] && [[ $(find "${REPO_DIR}" -maxdepth 0 -empty -type d | wc -l) -eq 1 ]]; then
-    # Create a basic structure for the repository
-    mkdir -p "${REPO_DIR}"/{shell,git,editors,kde,terminal}
+# If we have a restored backup, use it to populate the repository
+if [[ -n "${RESTORED_CONFIGS}" ]] && [[ ! -d "${REPO_DIR}/.git" ]]; then
+    echo "Using restored configurations to populate the repository..."
     
-    # Create a README file for the repository
-    cat > "${REPO_DIR}/README.md" << EOF
+    # Check if we have shell configurations
+    if [[ -n "${SHELL_CONFIGS_PATH}" ]] && [[ -d "${SHELL_CONFIGS_PATH}" ]]; then
+        mkdir -p "${REPO_DIR}/shell"
+        
+        # Copy shell configs
+        for config in .bashrc .bash_profile .zshrc .zsh_history .nanorc; do
+            if [[ -f "${SHELL_CONFIGS_PATH}/${config}" ]]; then
+                cp -f "${SHELL_CONFIGS_PATH}/${config}" "${REPO_DIR}/shell/$(basename "${config}")"
+                echo "✓ Added ${config} to repository"
+            fi
+        done
+    fi
+    
+    # Check for Git configurations
+    if [[ -n "${SHELL_CONFIGS_PATH}" ]] && [[ -f "${SHELL_CONFIGS_PATH}/.gitconfig" ]]; then
+        mkdir -p "${REPO_DIR}/git"
+        cp -f "${SHELL_CONFIGS_PATH}/.gitconfig" "${REPO_DIR}/git/gitconfig"
+        echo "✓ Added .gitconfig to repository"
+    fi
+    
+    # Check for editor configurations
+    if [[ -n "${GENERAL_CONFIGS_PATH}" ]] && [[ -d "${GENERAL_CONFIGS_PATH}/home/.config/Code/User" ]]; then
+        mkdir -p "${REPO_DIR}/editors/vscode"
+        
+        # Copy VS Code settings
+        if [[ -f "${GENERAL_CONFIGS_PATH}/home/.config/Code/User/settings.json" ]]; then
+            cp -f "${GENERAL_CONFIGS_PATH}/home/.config/Code/User/settings.json" "${REPO_DIR}/editors/vscode/settings.json"
+            echo "✓ Added VS Code settings to repository"
+        fi
+        
+        if [[ -f "${GENERAL_CONFIGS_PATH}/home/.config/Code/User/keybindings.json" ]]; then
+            cp -f "${GENERAL_CONFIGS_PATH}/home/.config/Code/User/keybindings.json" "${REPO_DIR}/editors/vscode/keybindings.json"
+            echo "✓ Added VS Code keybindings to repository"
+        fi
+    fi
+    
+    # Check for terminal configurations
+    if [[ -n "${SHELL_CONFIGS_PATH}" ]] && [[ -f "${SHELL_CONFIGS_PATH}/.tmux.conf" ]]; then
+        mkdir -p "${REPO_DIR}/terminal"
+        cp -f "${SHELL_CONFIGS_PATH}/.tmux.conf" "${REPO_DIR}/terminal/tmux.conf"
+        echo "✓ Added .tmux.conf to repository"
+    fi
+    
+    if [[ -n "${GENERAL_CONFIGS_PATH}" ]] && [[ -f "${GENERAL_CONFIGS_PATH}/home/.config/starship.toml" ]]; then
+        mkdir -p "${REPO_DIR}/terminal"
+        cp -f "${GENERAL_CONFIGS_PATH}/home/.config/starship.toml" "${REPO_DIR}/terminal/starship.toml"
+        echo "✓ Added starship.toml to repository"
+    fi
+    
+    # Initialize Git repository if not already done
+    if [[ ! -d "${REPO_DIR}/.git" ]]; then
+        (cd "${REPO_DIR}" && git init && git add . && git commit -m "Initial import from restored configurations")
+        echo "✓ Initialized Git repository with restored configurations"
+    fi
+    
+    # Set proper ownership
+    if [[ -n "${SUDO_USER}" ]]; then
+        chown -R "${SUDO_USER}":"${SUDO_USER}" "${REPO_DIR}"
+    fi
+else
+    # Only create template if it doesn't exist or is empty and no backup is available
+    if [[ ! -d "${REPO_DIR}/.git" ]] && [[ $(find "${REPO_DIR}" -maxdepth 0 -empty -type d | wc -l || true) -eq 1 ]]; then
+        echo "Creating template repository structure..."
+        
+        # Create a basic structure for the repository
+        mkdir -p "${REPO_DIR}"/{shell,git,editors,kde,terminal}
+        
+        # Create a README file for the repository
+        cat > "${REPO_DIR}/README.md" << EOF
 # Core Configuration Files
 
 This repository contains core configuration files that are symlinked from the home directory.
@@ -328,8 +466,8 @@ Some configurations aren't suitable for this repository (sensitive data, binary 
 These are backed up to \`~/config-backups/\` instead.
 EOF
 
-    # Create a basic symlink creation script
-    cat > "${REPO_DIR}/create_symlinks.sh" << 'EOF'
+        # Create a basic symlink creation script
+        cat > "${REPO_DIR}/create_symlinks.sh" << 'EOF'
 #!/bin/bash
 
 # Exit on error
@@ -390,17 +528,22 @@ fi
 echo "Symlinks created successfully!"
 EOF
 
-    # Make the symlink script executable
-    chmod +x "${REPO_DIR}/create_symlinks.sh"
-    
-    # Set proper ownership if running as sudo
-    if [[ "${SUDO_USER}" ]]; then
-        chown -R "${SUDO_USER}":"${SUDO_USER}" "${REPO_DIR}"
+        # Make the symlink script executable
+        chmod +x "${REPO_DIR}/create_symlinks.sh"
+        
+        # Set proper ownership if running as sudo
+        if [[ -n "${SUDO_USER}" ]]; then
+            chown -R "${SUDO_USER}":"${SUDO_USER}" "${REPO_DIR}"
+        fi
+        
+        echo "✓ Created repository template structure at ${REPO_DIR}"
+        
+        # Initialize Git repository
+        (cd "${REPO_DIR}" && git init && git add . && git commit -m "Initial template structure")
+        echo "✓ Initialized Git repository with template structure"
+    else
+        echo "Repository already initialized, skipping template creation"
     fi
-    
-    echo "✓ Created repository template structure at ${REPO_DIR}"
-else
-    echo "Repository already initialized, skipping template creation"
 fi
 
 # === STAGE 7: Check for New Configuration Files ===
@@ -410,7 +553,11 @@ section "Checking for New Configuration Files"
 check_post_installation_configs "backup-tools" "${BACKUP_TOOL_FILES[@]}"
 
 section "Configuration Management Setup Complete!"
-echo "Your integrated configuration management system is now set up:"
+if [[ -n "${RESTORED_CONFIGS}" ]]; then
+    echo "Your integrated configuration management system has been set up with restored configurations:"
+else
+    echo "Your integrated configuration management system is now set up:"
+fi
 echo "  1. Git repository for core configs: ${REPO_DIR}"
 echo "  2. Complementary backup directory: ${BACKUP_DIR}"
 echo "  3. Management scripts in backup directory"
@@ -423,5 +570,7 @@ echo
 echo "Next steps:"
 echo "  • Run ${BACKUP_DIR}/find_configs.sh to discover configurations"
 echo "  • Run ${BACKUP_DIR}/check_symlinks.sh to manage repository symlinks"
-echo "  • If repo is new: cd ${REPO_DIR} && git init"
+if [[ ! -d "${REPO_DIR}/.git" ]]; then
+    echo "  • If repo is new: cd ${REPO_DIR} && git init"
+fi
 echo "  • Consider backing up browser and application state to ${BACKUP_DIR}"

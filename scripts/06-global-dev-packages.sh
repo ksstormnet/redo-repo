@@ -4,6 +4,7 @@
 # This script installs recommended global packages for PHP and Node.js development
 # and manages development environment configurations using the repository
 # Assumes PHP 8.4, Composer, and Node.js are already installed
+# Modified to use restored configurations from /restart/critical_backups
 
 # Exit on any error
 set -e
@@ -13,14 +14,28 @@ set -e
 source /usr/local/lib/kde-installer/functions.sh
 
 # Determine user home directory
-if [[ "${SUDO_USER}" ]]; then
-    USER_HOME=$(getent passwd "${SUDO_USER}" | cut -d: -f6)
+if [[ -n "${SUDO_USER}" ]]; then
+    USER_HOME=$(getent passwd "${SUDO_USER}" | cut -d: -f6) || true
     # shellcheck disable=SC2034
     ACTUAL_USER="${SUDO_USER}"
 else
     USER_HOME="${HOME}"
     # shellcheck disable=SC2034
     ACTUAL_USER="${USER}"
+fi
+
+# Check for restored configurations
+CONFIG_MAPPING="/restart/critical_backups/config_mapping.txt"
+RESTORED_CONFIGS_AVAILABLE=false
+
+if [[ -f "${CONFIG_MAPPING}" ]]; then
+    echo "Found restored configuration mapping at ${CONFIG_MAPPING}"
+    # shellcheck disable=SC1090
+    source "${CONFIG_MAPPING}"
+    RESTORED_CONFIGS_AVAILABLE=true
+else
+    echo "No restored configuration mapping found at ${CONFIG_MAPPING}"
+    echo "Will proceed with default configurations."
 fi
 
 # Define configuration files for development tools
@@ -91,10 +106,10 @@ check_requirements() {
     fi
     
     echo "✅ All required tools are installed."
-    echo "PHP Version: $(php -v | head -n 1)"
-    echo "Composer Version: $(composer --version)"
-    echo "Node.js Version: $(node -v)"
-    echo "npm Version: $(npm -v)"
+    echo "PHP Version: $(php -v | head -n 1 || true)"
+    echo "Composer Version: $(composer --version || true)"
+    echo "Node.js Version: $(node -v || true)"
+    echo "npm Version: $(npm -v || true)"
 }
 
 # === STAGE 1: Pre-Installation Configuration ===
@@ -106,8 +121,110 @@ handle_pre_installation_config "composer" "${COMPOSER_CONFIG_FILES[@]}"
 handle_pre_installation_config "git" "${GIT_CONFIG_FILES[@]}"
 handle_pre_installation_config "bin" "${BIN_SCRIPT_FILES[@]}"
 
-# Install global Node.js packages
-install_node_globals() {
+# Check if requirements are met
+check_requirements
+
+# === STAGE 2: Check for Restored Global Packages Lists ===
+section "Checking for Restored Global Packages Lists"
+
+# Initialize tracking variables for restoration status
+RESTORED_NPM_PACKAGES=false
+RESTORED_COMPOSER_PACKAGES=false
+# shellcheck disable=SC2034
+RESTORED_PROJECT_TEMPLATES=false
+# shellcheck disable=SC2034
+RESTORED_BIN_SCRIPTS=false
+
+# Check for restored npm global packages list
+RESTORED_NPM_LIST=""
+if [[ "${RESTORED_CONFIGS_AVAILABLE}" = true ]]; then
+    NPM_LIST_PATHS=(
+        "${GENERAL_CONFIGS_PATH}/node/npm-global-packages.txt"
+        "${GENERAL_CONFIGS_PATH}/npm-global-packages.txt"
+        "${HOME_CONFIGS_PATH}/npm-global-packages.txt"
+    )
+    
+    for path in "${NPM_LIST_PATHS[@]}"; do
+        if [[ -f "${path}" ]]; then
+            echo "Found restored npm global packages list at ${path}"
+            RESTORED_NPM_LIST="${path}"
+            RESTORED_NPM_PACKAGES=true
+            break
+        fi
+    done
+fi
+
+# Check for restored composer global packages list
+RESTORED_COMPOSER_LIST=""
+if [[ "${RESTORED_CONFIGS_AVAILABLE}" = true ]]; then
+    COMPOSER_LIST_PATHS=(
+        "${GENERAL_CONFIGS_PATH}/composer/composer-global-packages.txt"
+        "${GENERAL_CONFIGS_PATH}/composer-global-packages.txt"
+        "${HOME_CONFIGS_PATH}/composer-global-packages.txt"
+    )
+    
+    for path in "${COMPOSER_LIST_PATHS[@]}"; do
+        if [[ -f "${path}" ]]; then
+            echo "Found restored composer global packages list at ${path}"
+            # shellcheck disable=SC2034
+            RESTORED_COMPOSER_LIST="${path}"
+            # shellcheck disable=SC2034
+            RESTORED_COMPOSER_PACKAGES=true
+            break
+        fi
+    done
+fi
+
+# Check for restored project templates
+if [[ "${RESTORED_CONFIGS_AVAILABLE}" = true ]]; then
+    TEMPLATE_PATHS=(
+        "${GENERAL_CONFIGS_PATH}/home/Templates/Development"
+        "${HOME_CONFIGS_PATH}/Templates/Development"
+    )
+    
+    for path in "${TEMPLATE_PATHS[@]}"; do
+        if [[ -d "${path}" ]]; then
+            echo "Found restored project templates at ${path}"
+            # shellcheck disable=SC2034
+            RESTORED_PROJECT_TEMPLATES=true
+            break
+        fi
+    done
+fi
+
+# Check for restored bin scripts
+if [[ "${RESTORED_CONFIGS_AVAILABLE}" = true ]]; then
+    BIN_PATHS=(
+        "${GENERAL_CONFIGS_PATH}/home/bin"
+        "${HOME_CONFIGS_PATH}/bin"
+    )
+    
+    for path in "${BIN_PATHS[@]}"; do
+        if [[ -d "${path}" ]]; then
+            echo "Found restored bin scripts at ${path}"
+            # shellcheck disable=SC2034
+            RESTORED_BIN_SCRIPTS=true
+            break
+        fi
+    done
+fi
+
+# === STAGE 3: Install Global Node.js Packages ===
+if [[ "${RESTORED_NPM_PACKAGES}" = true ]] && [[ -f "${RESTORED_NPM_LIST}" ]]; then
+    section "Installing Restored Global Node.js Packages"
+    
+    echo "Installing global Node.js packages from restored list..."
+    while IFS= read -r package || [[ -n "${package}" ]]; do
+        # Skip empty lines and comments
+        if [[ -z "${package}" || "${package}" == \#* ]]; then
+            continue
+        fi
+        echo "Installing package: ${package}"
+        npm install -g "${package}"
+    done < "${RESTORED_NPM_LIST}"
+    
+    echo "✅ Restored global Node.js packages installed successfully."
+else
     section "Installing Global Node.js Packages"
     
     # Development workflow tools
@@ -155,10 +272,31 @@ install_node_globals() {
     npm install -g next            # Next.js
     
     echo "✅ Global Node.js packages installed successfully."
-}
+    
+    # Create a record of installed packages for future restoration
+    npm list -g --depth=0 > "${USER_HOME}/npm-global-packages.txt"
+    if [[ -d "/repo/personal/core-configs/node" ]]; then
+        cp "${USER_HOME}/npm-global-packages.txt" "/repo/personal/core-configs/node/"
+        echo "✓ Saved list of global npm packages to repository"
+    fi
+fi
 
-# Install global Composer packages
-install_composer_globals() {
+# === STAGE 4: Install Global Composer Packages ===
+if [[ "${RESTORED_COMPOSER_PACKAGES}" = true ]] && [[ -f "${RESTORED_COMPOSER_LIST}" ]]; then
+    section "Installing Restored Global Composer Packages"
+    
+    echo "Installing global Composer packages from restored list..."
+    while IFS= read -r package || [[ -n "${package}" ]]; do
+        # Skip empty lines and comments
+        if [[ -z "${package}" || "${package}" == \#* ]]; then
+            continue
+        fi
+        echo "Installing package: ${package}"
+        composer global require "${package}"
+    done < "${RESTORED_COMPOSER_LIST}"
+    
+    echo "✅ Restored global Composer packages installed successfully."
+else
     section "Installing Global Composer Packages"
     
     # Code quality and analysis tools
@@ -190,443 +328,16 @@ install_composer_globals() {
     composer global require phpdocumentor/phpdocumentor     # PHP Documentor
     
     echo "✅ Global Composer packages installed successfully."
-}
-
-# Configure PATH for Composer global binaries
-configure_composer_path() {
-    section "Configuring PATH for Composer Global Binaries"
     
-    # Determine shell configuration file
-    SHELL_CONFIG=""
-    if [[ -n "${BASH_VERSION}" ]]; then
-        if [[ -f "${USER_HOME}/.bashrc" ]]; then
-            SHELL_CONFIG="${USER_HOME}/.bashrc"
-        elif [[ -f "${USER_HOME}/.bash_profile" ]]; then
-            SHELL_CONFIG="${USER_HOME}/.bash_profile"
-        fi
-    elif [[ -n "${ZSH_VERSION}" ]]; then
-        SHELL_CONFIG="${USER_HOME}/.zshrc"
-    else
-        echo "⚠️ Could not determine shell configuration file. You'll need to manually add Composer's bin directory to your PATH."
-        return
+    # Create a record of installed packages for future restoration
+    composer global show > "${USER_HOME}/composer-global-packages.txt"
+    if [[ -d "/repo/personal/core-configs/composer" ]]; then
+        cp "${USER_HOME}/composer-global-packages.txt" "/repo/personal/core-configs/composer/"
+        echo "✓ Saved list of global Composer packages to repository"
     fi
-    
-    # Get Composer global bin directory
-    COMPOSER_BIN_DIR=$(composer global config bin-dir --absolute 2>/dev/null || echo "${USER_HOME}/.composer/vendor/bin")
-    
-    # Check if PATH already contains Composer bin directory
-    if echo "${PATH}" | grep -q "${COMPOSER_BIN_DIR}"; then
-        echo "✅ Composer bin directory is already in PATH."
-    else
-        # Add Composer bin directory to PATH
-        echo "export PATH=\"\$PATH:${COMPOSER_BIN_DIR}\"" >> "${SHELL_CONFIG}"
-        echo "✅ Added Composer bin directory to PATH in ${SHELL_CONFIG}."
-        echo "   Please run 'source ${SHELL_CONFIG}' to update your current session."
-    fi
-}
-
-# Create project templates
-create_project_templates() {
-    section "Creating Project Templates"
-    
-    # Create templates directory
-    TEMPLATES_DIR="${USER_HOME}/Templates/Development"
-    mkdir -p "${TEMPLATES_DIR}"
-    
-    # Create Node.js project template
-    NODE_TEMPLATE_DIR="${TEMPLATES_DIR}/node-project"
-    mkdir -p "${NODE_TEMPLATE_DIR}"
-    
-    # Create package.json template if it doesn't exist
-    if [[ ! -f "${NODE_TEMPLATE_DIR}/package.json" ]]; then
-        cat > "${NODE_TEMPLATE_DIR}/package.json" << EOF
-{
-  "name": "project-name",
-  "version": "1.0.0",
-  "description": "Project description",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
-    "test": "jest",
-    "lint": "eslint ."
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "eslint": "^8.42.0",
-    "jest": "^29.5.0",
-    "nodemon": "^2.0.22"
-  }
-}
-EOF
-    fi
-    
-    # Create .gitignore template if it doesn't exist
-    if [[ ! -f "${NODE_TEMPLATE_DIR}/.gitignore" ]]; then
-        cat > "${NODE_TEMPLATE_DIR}/.gitignore" << EOF
-# Dependency directories
-node_modules/
-jspm_packages/
-
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Coverage directory used by tools like istanbul
-coverage/
-
-# Build outputs
-dist/
-build/
-out/
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-EOF
-    fi
-    
-    # Create README template if it doesn't exist
-    if [[ ! -f "${NODE_TEMPLATE_DIR}/README.md" ]]; then
-        cat > "${NODE_TEMPLATE_DIR}/README.md" << EOF
-# Project Name
-
-Project description goes here.
-
-## Installation
-
-\`\`\`bash
-npm install
-\`\`\`
-
-## Usage
-
-\`\`\`bash
-npm start
-\`\`\`
-
-## Development
-
-\`\`\`bash
-npm run dev
-\`\`\`
-
-## Testing
-
-\`\`\`bash
-npm test
-\`\`\`
-EOF
-    fi
-    
-    # Create PHP project template
-    PHP_TEMPLATE_DIR="${TEMPLATES_DIR}/php-project"
-    mkdir -p "${PHP_TEMPLATE_DIR}/src"
-    mkdir -p "${PHP_TEMPLATE_DIR}/tests"
-    
-    # Create composer.json template if it doesn't exist
-    if [[ ! -f "${PHP_TEMPLATE_DIR}/composer.json" ]]; then
-        cat > "${PHP_TEMPLATE_DIR}/composer.json" << EOF
-{
-    "name": "vendor/project",
-    "description": "Project description",
-    "type": "project",
-    "require": {
-        "php": "^8.4"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^10.0",
-        "squizlabs/php_codesniffer": "^3.7",
-        "phpstan/phpstan": "^1.10"
-    },
-    "autoload": {
-        "psr-4": {
-            "App\\\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "App\\\\Tests\\\\": "tests/"
-        }
-    },
-    "scripts": {
-        "test": "phpunit",
-        "phpcs": "phpcs --standard=PSR12 src tests",
-        "phpstan": "phpstan analyse src tests"
-    }
-}
-EOF
-    fi
-    
-    # Create PHP .gitignore template if it doesn't exist
-    if [[ ! -f "${PHP_TEMPLATE_DIR}/.gitignore" ]]; then
-        cat > "${PHP_TEMPLATE_DIR}/.gitignore" << EOF
-# Composer files
-/vendor/
-composer.phar
-composer.lock
-
-# PHPUnit
-/phpunit.xml
-.phpunit.result.cache
-
-# Environment files
-.env
-.env.local
-
-# IDE files
-.idea/
-.vscode/
-*.sublime-project
-*.sublime-workspace
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-EOF
-    fi
-    
-    # Create PHP README template if it doesn't exist
-    if [[ ! -f "${PHP_TEMPLATE_DIR}/README.md" ]]; then
-        cat > "${PHP_TEMPLATE_DIR}/README.md" << EOF
-# PHP Project
-
-PHP project description goes here.
-
-## Requirements
-
-- PHP 8.4 or higher
-- Composer
-
-## Installation
-
-\`\`\`bash
-composer install
-\`\`\`
-
-## Testing
-
-\`\`\`bash
-composer test
-\`\`\`
-
-## Code Quality
-
-\`\`\`bash
-composer phpcs    # Code style check
-composer phpstan  # Static analysis
-\`\`\`
-EOF
-    fi
-    
-    # Set proper ownership
-    if [[ "${SUDO_USER}" ]]; then
-        chown -R "${SUDO_USER}":"${SUDO_USER}" "${TEMPLATES_DIR}"
-    fi
-    
-    echo "✅ Project templates created in ${TEMPLATES_DIR}"
-    echo "   - Node.js project template: ${TEMPLATES_DIR}/node-project"
-    echo "   - PHP project template: ${TEMPLATES_DIR}/php-project"
-}
-
-# Create bin directory and helper scripts
-setup_bin_directory() {
-    section "Setting Up Bin Directory"
-    
-    # Create bin directory
-    BIN_DIR="${USER_HOME}/bin"
-    mkdir -p "${BIN_DIR}"
-    
-    # Create script to generate new Node.js project if it doesn't exist
-    if ! handle_installed_software_config "bin" "${BIN_DIR}/new-node-project"; then
-        cat > "${BIN_DIR}/new-node-project" << 'EOF'
-#!/bin/bash
-
-if [ $# -lt 1 ]; then
-    echo "Usage: new-node-project <project-name> [directory]"
-    exit 1
 fi
 
-PROJECT_NAME=$1
-DIRECTORY=${2:-$PROJECT_NAME}
-
-# Create project directory
-mkdir -p "$DIRECTORY"
-cd "$DIRECTORY" || exit
-
-# Check if Templates directory exists
-TEMPLATE_DIR="$HOME/Templates/Development/node-project"
-if [ ! -d "$TEMPLATE_DIR" ]; then
-    echo "Error: Template directory not found at $TEMPLATE_DIR"
-    echo "Please run the global-dev-packages setup script first"
-    exit 1
-fi
-
-# Copy template files
-cp -r "$TEMPLATE_DIR/"* .
-cp -r "$TEMPLATE_DIR/".* . 2>/dev/null || true
-
-# Update package.json with project name
-sed -i "s/project-name/$PROJECT_NAME/g" package.json
-
-# Initialize git repository
-git init
-git add .
-git commit -m "Initial commit"
-
-# Install dependencies
-npm install
-
-echo "✅ Node.js project '$PROJECT_NAME' created successfully in '$DIRECTORY'"
-echo "   cd '$DIRECTORY' to get started"
-EOF
-        chmod +x "${BIN_DIR}/new-node-project"
-        
-        # Now move it to the repo and create a symlink
-        handle_installed_software_config "bin" "${BIN_DIR}/new-node-project"
-    fi
-    
-    # Create script to generate new PHP project if it doesn't exist
-    if ! handle_installed_software_config "bin" "${BIN_DIR}/new-php-project"; then
-        cat > "${BIN_DIR}/new-php-project" << 'EOF'
-#!/bin/bash
-
-if [ $# -lt 1 ]; then
-    echo "Usage: new-php-project <project-name> [directory]"
-    exit 1
-fi
-
-PROJECT_NAME=$1
-DIRECTORY=${2:-$PROJECT_NAME}
-
-# Create project directory
-mkdir -p "$DIRECTORY"
-cd "$DIRECTORY" || exit
-
-# Check if Templates directory exists
-TEMPLATE_DIR="$HOME/Templates/Development/php-project"
-if [ ! -d "$TEMPLATE_DIR" ]; then
-    echo "Error: Template directory not found at $TEMPLATE_DIR"
-    echo "Please run the global-dev-packages setup script first"
-    exit 1
-fi
-
-# Copy template files
-cp -r "$TEMPLATE_DIR/"* .
-cp -r "$TEMPLATE_DIR/".* . 2>/dev/null || true
-
-# Update composer.json with project name
-SANITIZED_NAME=$(echo "$PROJECT_NAME" | tr '[:upper:]' '[:lower:]' | tr ' ' '-')
-sed -i "s/vendor\/project/$SANITIZED_NAME/g" composer.json
-
-# Initialize git repository
-git init
-git add .
-git commit -m "Initial commit"
-
-# Install dependencies
-composer install
-
-echo "✅ PHP project '$PROJECT_NAME' created successfully in '$DIRECTORY'"
-echo "   cd '$DIRECTORY' to get started"
-EOF
-        chmod +x "${BIN_DIR}/new-php-project"
-        
-        # Now move it to the repo and create a symlink
-        handle_installed_software_config "bin" "${BIN_DIR}/new-php-project"
-    fi
-    
-    # Add bin directory to PATH if needed
-    if ! echo "${PATH}" | grep -q "${BIN_DIR}"; then
-        if [[ -n "${SHELL_CONFIG}" ]]; then
-            echo "export PATH=\"\$PATH:${BIN_DIR}\"" >> "${SHELL_CONFIG}"
-            echo "✅ Added bin directory to PATH in ${SHELL_CONFIG}."
-        else
-            echo "⚠️ Could not determine shell configuration file. You'll need to manually add ${BIN_DIR} to your PATH."
-        fi
-    fi
-    
-    echo "✅ Bin directory setup at ${BIN_DIR}"
-    echo "   Project helper scripts will be installed to this location."
-}
-
-# === STAGE 2: Install Global Packages ===
-section "Installing Global Packages"
-
-# Check requirements
-check_requirements
-
-# Install global Node.js packages
-install_node_globals
-
-# Install global Composer packages
-install_composer_globals
-
-# Configure Composer PATH
-configure_composer_path
-
-# Create project templates
-create_project_templates
-
-# Setup bin directory and helper scripts
-setup_bin_directory
-
-# === STAGE 3: Manage Development Tool Configurations ===
-section "Managing Development Tool Configurations"
-
-# Create required directories
-mkdir -p "${USER_HOME}/.config/typescript"
-mkdir -p "${USER_HOME}/.config/phpcs"
-mkdir -p "${USER_HOME}/.composer"
-
-# Handle configuration files
-handle_installed_software_config "node" "${NODE_CONFIG_FILES[@]}"
-handle_installed_software_config "composer" "${COMPOSER_CONFIG_FILES[@]}"
-handle_installed_software_config "git" "${GIT_CONFIG_FILES[@]}"
-handle_installed_software_config "bin" "${BIN_SCRIPT_FILES[@]}"
-
-# Configure Git global gitignore if needed
-if [[ -f "${USER_HOME}/.gitignore_global" ]]; then
-    git config --global core.excludesfile "${USER_HOME}/.gitignore_global"
-fi
-
-# Configure Git credential helper if needed
-if [[ -f "${USER_HOME}/.git-credentials" ]]; then
-    git config --global credential.helper store
-fi
-
-# Set proper ownership
-if [[ "${SUDO_USER}" ]]; then
-    chown -R "${SUDO_USER}":"${SUDO_USER}" "${USER_HOME}/.config"
-    chown -R "${SUDO_USER}":"${SUDO_USER}" "${USER_HOME}/.composer"
-    chown -R "${SUDO_USER}":"${SUDO_USER}" "${USER_HOME}/.gitconfig"
-    chown -R "${SUDO_USER}":"${SUDO_USER}" "${USER_HOME}/.gitignore_global"
-    [[ -f "${USER_HOME}/.git-credentials" ]] && chown "${SUDO_USER}":"${SUDO_USER}" "${USER_HOME}/.git-credentials"
-fi
-
-# === STAGE 4: Check for New Configuration Files ===
+# === STAGE 5: Check for New Configuration Files ===
 section "Checking for New Configuration Files"
 
 # Check for any new configuration files created during installation
@@ -635,21 +346,17 @@ check_post_installation_configs "composer" "${COMPOSER_CONFIG_FILES[@]}"
 check_post_installation_configs "git" "${GIT_CONFIG_FILES[@]}"
 check_post_installation_configs "bin" "${BIN_SCRIPT_FILES[@]}"
 
-section "Setup Complete!"
-echo "✅ Global development packages have been installed and configurations managed."
-echo 
-echo "To use the helper scripts:"
-echo "  new-node-project myproject     # Create a new Node.js project"
-echo "  new-php-project myproject      # Create a new PHP project"
+section "Global Development Packages Setup Complete!"
+echo "You now have a comprehensive set of global development packages installed."
+echo "Notable packages include:"
+echo "  - Node.js: nodemon, eslint, prettier, typescript, etc."
+echo "  - PHP: PHP_CodeSniffer, PHPStan, PHP-CS-Fixer, etc."
 echo
-echo "All configurations are managed through the repository at: /repo/personal/core-configs/"
-echo "  - If a configuration existed in the repo, it was symlinked to the correct location"
-echo "  - If a configuration was created during installation, it was moved to the repo and symlinked"
-echo "  - Any changes to configurations should be made in the repository"
-echo
-echo "To apply PATH changes to your current session:"
-if [[ -n "${SHELL_CONFIG}" ]]; then
-    echo "  source ${SHELL_CONFIG}"
+if [[ "${RESTORED_CONFIGS_AVAILABLE}" = true ]]; then
+    echo "Your restored development configurations have been applied from the backup."
 else
-    echo "  Please restart your terminal or source your shell configuration file."
+    echo "All configurations are managed through the repository at: /repo/personal/core-configs/"
+    echo "  - If a configuration existed in the repo, it was symlinked to the correct location"
+    echo "  - If a configuration was created during installation, it was moved to the repo and symlinked"
+    echo "  - Any changes to configurations should be made in the repository"
 fi

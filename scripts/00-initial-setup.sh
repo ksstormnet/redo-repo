@@ -35,8 +35,10 @@ add_repository() {
     echo "Adding repository: ${repo_name}..."
     
     if [[ -n "${keyring_url}" ]]; then
-        curl -fsSL "${keyring_url}" | gpg --dearmor -o "/usr/share/keyrings/${repo_name}-archive-keyring.gpg"
-        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/${repo_name}-archive-keyring.gpg] ${repo_url} $(lsb_release -cs) main" | tee "/etc/apt/sources.list.d/${repo_name}.list" > /dev/null
+        curl -fsSL "${keyring_url}" | gpg --dearmor -o "/usr/share/keyrings/${repo_name}-archive-keyring.gpg" || true
+        local codename
+        codename=$(lsb_release -cs) || codename="focal"
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/${repo_name}-archive-keyring.gpg] ${repo_url} ${codename} main" | tee "/etc/apt/sources.list.d/${repo_name}.list" > /dev/null
     else
         add-apt-repository -y "${repo_url}"
     fi
@@ -46,7 +48,7 @@ add_repository() {
 
 # Get the actual user when running with sudo
 get_actual_user() {
-    if [[ "${SUDO_USER}" ]]; then
+    if [[ -n "${SUDO_USER}" ]]; then
         echo "${SUDO_USER}"
     else
         echo "${USER}"
@@ -55,8 +57,8 @@ get_actual_user() {
 
 # Get the actual user's home directory
 get_user_home() {
-    if [[ "${SUDO_USER}" ]]; then
-        getent passwd "${SUDO_USER}" | cut -d: -f6
+    if [[ -n "${SUDO_USER}" ]]; then
+        getent passwd "${SUDO_USER}" | cut -d: -f6 || true
     else
         echo "${HOME}"
     fi
@@ -66,9 +68,13 @@ get_user_home() {
 set_user_ownership() {
     local path="${1}"
     local user
-    user=$(get_actual_user)
     
-    if [[ "${SUDO_USER}" ]]; then
+    # Get the actual user separately to avoid set -e issues
+    set +e
+    user=$(get_actual_user)
+    set -e
+    
+    if [[ -n "${SUDO_USER}" ]]; then
         chown -R "${user}":"${user}" "${path}"
     fi
 }
@@ -83,7 +89,9 @@ create_symlink() {
     
     # Backup existing file if it exists and is not a symlink
     if [[ -e "${dest_link}" ]] && [[ ! -L "${dest_link}" ]]; then
-        mv "${dest_link}" "${dest_link}.orig.$(date +%Y%m%d-%H%M%S)"
+        local timestamp
+        timestamp=$(date +%Y%m%d-%H%M%S) || timestamp="backup"
+        mv "${dest_link}" "${dest_link}.orig.${timestamp}"
         echo "  Backed up existing file: ${dest_link}"
     elif [[ -L "${dest_link}" ]]; then
         rm "${dest_link}"
@@ -96,6 +104,19 @@ create_symlink() {
     # Create symlink
     ln -sf "${source_file}" "${dest_link}"
     echo "✓ Created symlink: ${dest_link} -> ${source_file}"
+}
+
+# Function to check if restored configs are available
+check_restored_configs() {
+    if [[ -n "${CONFIG_MAPPING_PATH}" ]] && [[ -f "${CONFIG_MAPPING_PATH}" ]]; then
+        echo "Restored configuration mapping found at: ${CONFIG_MAPPING_PATH}"
+        # shellcheck disable=SC1090
+        source "${CONFIG_MAPPING_PATH}"
+        return 0
+    else
+        echo "No restored configuration mapping found. Using default configurations."
+        return 1
+    fi
 }
 
 # === STAGE 1: Create Configuration Management Functions ===
@@ -332,6 +353,47 @@ check_post_installation_configs() {
     
     echo "✓ Post-installation configuration check for ${software_name} completed"
 }
+
+# Function to restore configuration from backup if available
+# Usage: restore_from_backup <target_path> <backup_relative_path> <description>
+restore_from_backup() {
+    local target_path="${1}"
+    local backup_relative_path="${2}"
+    local description="${3}"
+    
+    # Check if CONFIG_MAPPING_PATH is defined and file exists
+    if [[ -n "${CONFIG_MAPPING_PATH}" ]] && [[ -f "${CONFIG_MAPPING_PATH}" ]]; then
+        source "${CONFIG_MAPPING_PATH}"
+        
+        # Check various possible locations for the backup
+        local backup_locations=(
+            "${GENERAL_CONFIGS_PATH}/${backup_relative_path}"
+            "${SHELL_CONFIGS_PATH}/${backup_relative_path##*/}"
+            "${ADDITIONAL_CONFIGS_PATH}/${backup_relative_path}"
+            "${SCRIPT_CONFIGS_PATH}/${backup_relative_path}"
+        )
+        
+        for backup_path in "${backup_locations[@]}"; do
+            if [[ -e "${backup_path}" ]]; then
+                echo "Found backup for ${description} at: ${backup_path}"
+                
+                # Create parent directory if it doesn't exist
+                mkdir -p "$(dirname "${target_path}")"
+                
+                # Copy the backup to the target path
+                cp -r "${backup_path}" "${target_path}"
+                echo "✓ Restored ${description} from backup"
+                return 0
+            fi
+        done
+        
+        echo "No backup found for ${description}"
+        return 1
+    else
+        echo "No configuration mapping available. Cannot restore ${description}"
+        return 1
+    fi
+}
 EOF
 
 # Make the functions file executable
@@ -434,6 +496,46 @@ create_symlink() {
     echo "✓ Created symlink: ${dest_link} -> ${source_file}"
 }
 
+# Function to restore configuration from backup if available
+restore_from_backup() {
+    local target_path="${1}"
+    local backup_relative_path="${2}"
+    local description="${3}"
+    
+    # Check if CONFIG_MAPPING_PATH is defined and file exists
+    if [[ -n "${CONFIG_MAPPING_PATH}" ]] && [[ -f "${CONFIG_MAPPING_PATH}" ]]; then
+        source "${CONFIG_MAPPING_PATH}"
+        
+        # Check various possible locations for the backup
+        local backup_locations=(
+            "${GENERAL_CONFIGS_PATH}/${backup_relative_path}"
+            "${SHELL_CONFIGS_PATH}/${backup_relative_path##*/}"
+            "${ADDITIONAL_CONFIGS_PATH}/${backup_relative_path}"
+            "${SCRIPT_CONFIGS_PATH}/${backup_relative_path}"
+        )
+        
+        for backup_path in "${backup_locations[@]}"; do
+            if [[ -e "${backup_path}" ]]; then
+                echo "Found backup for ${description} at: ${backup_path}"
+                
+                # Create parent directory if it doesn't exist
+                mkdir -p "$(dirname "${target_path}")"
+                
+                # Copy the backup to the target path
+                cp -r "${backup_path}" "${target_path}"
+                echo "✓ Restored ${description} from backup"
+                return 0
+            fi
+        done
+        
+        echo "No backup found for ${description}"
+        return 1
+    else
+        echo "No configuration mapping available. Cannot restore ${description}"
+        return 1
+    fi
+}
+
 # Source the configuration management functions
 # shellcheck disable=SC1090
 source /usr/local/lib/kde-installer/config-management-functions.sh
@@ -482,7 +584,10 @@ echo "✓ Created log directory"
 section "Checking System Requirements"
 
 # Check disk space
+set +e
 ROOT_SPACE=$(df -h / | awk 'NR==2 {print $4}')
+set -e
+ROOT_SPACE=${ROOT_SPACE:-"unknown"}
 echo "Available space on root partition: ${ROOT_SPACE}"
 
 # Check if running on Ubuntu Server
@@ -521,7 +626,10 @@ fi
 section "Setting up SSH"
 
 # Install SSH server if not already installed
-if ! dpkg -l | grep -q openssh-server; then
+set +e
+SSH_INSTALLED=$(dpkg -l | grep -q openssh-server && echo "yes" || echo "no")
+set -e
+if [[ "${SSH_INSTALLED}" == "no" ]]; then
     install_packages "SSH Server" openssh-server
 fi
 
@@ -530,7 +638,51 @@ systemctl enable ssh
 systemctl start ssh
 echo "✓ SSH service enabled and started"
 
-# === STAGE 7: Create Development Directory Structure ===
+# === STAGE 7: Check for Restored SSH Configuration ===
+section "Checking for Restored SSH Configuration"
+
+# Check if we have restored configurations
+check_restored_configs
+
+# Set up restored SSH configs if available
+if [[ -n "${SSH_PATH}" ]] && [[ -d "${SSH_PATH}" ]]; then
+    echo "Found restored SSH configuration at: ${SSH_PATH}"
+    
+    # Create .ssh directory if it doesn't exist
+    set +e
+    USER_HOME=$(get_user_home)
+    set -e
+    USER_HOME=${USER_HOME:-"${HOME}"}
+    mkdir -p "${USER_HOME}/.ssh"
+    chmod 700 "${USER_HOME}/.ssh"
+    
+    # Copy all SSH files from backup
+    cp -r "${SSH_PATH}"/* "${USER_HOME}/.ssh/"
+    chmod 600 "${USER_HOME}/.ssh/id_rsa" 2>/dev/null || true
+    chmod 644 "${USER_HOME}/.ssh/id_rsa.pub" 2>/dev/null || true
+    chmod 600 "${USER_HOME}/.ssh/config" 2>/dev/null || true
+    chmod 600 "${USER_HOME}/.ssh/authorized_keys" 2>/dev/null || true
+    
+    # Set proper ownership
+    set_user_ownership "${USER_HOME}/.ssh"
+    
+    echo "✓ Restored SSH configuration from backup"
+else
+    echo "No restored SSH configuration found. Creating basic SSH structure."
+    
+    # Create .ssh directory if it doesn't exist
+    set +e
+    USER_HOME=$(get_user_home)
+    set -e
+    USER_HOME=${USER_HOME:-"${HOME}"}
+    mkdir -p "${USER_HOME}/.ssh"
+    chmod 700 "${USER_HOME}/.ssh"
+    set_user_ownership "${USER_HOME}/.ssh"
+    
+    echo "✓ Created basic SSH structure"
+fi
+
+# === STAGE 8: Create Development Directory Structure ===
 section "Creating Development Directory Structure"
 
 # Create the development directory
@@ -542,12 +694,15 @@ ln -sf /data/Development/repo /repo
 echo "✓ Created /repo symlink pointing to /data/Development/repo"
 
 # Set proper ownership
+set +e
 ACTUAL_USER=$(get_actual_user)
+set -e
+ACTUAL_USER=${ACTUAL_USER:-"${USER}"}
 chown -R "${ACTUAL_USER}":"${ACTUAL_USER}" /data/Development
 chown -R "${ACTUAL_USER}":"${ACTUAL_USER}" /repo
 echo "✓ Set ownership of directories to ${ACTUAL_USER}"
 
-# === STAGE 8: Clone Configuration Repository ===
+# === STAGE 9: Clone Configuration Repository ===
 section "Cloning Configuration Repository"
 
 # Create personal repo directory
@@ -562,7 +717,7 @@ clone_configs_repo() {
     local ssh_success=false
     
     # Clone the repository as the actual user
-    if [[ "${SUDO_USER}" ]]; then
+    if [[ -n "${SUDO_USER}" ]]; then
         if su - "${SUDO_USER}" -c "git clone git@github.com:ksstormnet/core-configs.git /repo/personal/core-configs"; then
             ssh_success=true
         fi
@@ -581,7 +736,7 @@ clone_configs_repo() {
         echo "Attempting to clone using HTTPS instead..."
         
         # Try HTTPS clone as fallback
-        if [[ "${SUDO_USER}" ]]; then
+        if [[ -n "${SUDO_USER}" ]]; then
             if su - "${SUDO_USER}" -c "git clone https://github.com/ksstormnet/core-configs.git /repo/personal/core-configs"; then
                 echo "✓ Successfully cloned core-configs repository using HTTPS"
                 return 0
@@ -600,7 +755,11 @@ clone_configs_repo() {
 }
 
 # Clone the configuration repository
-if ! clone_configs_repo; then
+set +e
+CLONE_RESULT=0
+clone_configs_repo || CLONE_RESULT=$?
+set -e
+if [[ ${CLONE_RESULT} -ne 0 ]]; then
     echo "Warning: Failed to clone configuration repository."
     echo "You can manually clone it later with:"
     echo "  git clone git@github.com:ksstormnet/core-configs.git /repo/personal/core-configs"
@@ -613,62 +772,151 @@ if ! clone_configs_repo; then
     fi
 fi
 
-# === STAGE 9: Create Symlinks to Configuration Files ===
-section "Creating Symlinks to Essential Configuration Files"
+# === STAGE 10: Set Up Shell Configurations from Backup ===
+section "Setting Up Shell Configurations"
 
-# Only proceed if the repository was successfully cloned
-if [[ -d "/repo/personal/core-configs" ]]; then
-    USER_HOME=$(get_user_home)
-    # Repository directory path
-    # shellcheck disable=SC2034
-    CONFIGS_DIR="/repo/personal/core-configs"
+# Check if we have restored shell configurations
+check_restored_configs
+
+set +e
+USER_HOME=$(get_user_home)
+set -e
+USER_HOME=${USER_HOME:-"${HOME}"}
+
+# First try to restore shell configurations from backup
+if [[ -n "${SHELL_CONFIGS_PATH}" ]] && [[ -d "${SHELL_CONFIGS_PATH}" ]]; then
+    echo "Found restored shell configurations at: ${SHELL_CONFIGS_PATH}"
     
-    # Define configuration files for SSH
-    SSH_CONFIG_FILES=(
-        "${USER_HOME}/.ssh/config"
-        "${USER_HOME}/.ssh/id_rsa"
-        "${USER_HOME}/.ssh/id_rsa.pub"
-        "${USER_HOME}/.ssh/authorized_keys"
+    # Look for common shell configuration files
+    for config_file in .bashrc .bash_profile .bash_aliases .profile .zshrc; do
+        if [[ -f "${SHELL_CONFIGS_PATH}/${config_file}" ]]; then
+            # Back up existing file if it exists
+            if [[ -f "${USER_HOME}/${config_file}" ]]; then
+                timestamp=$(date +%Y%m%d-%H%M%S) || timestamp="backup"
+                mv "${USER_HOME}/${config_file}" "${USER_HOME}/${config_file}.orig.${timestamp}"
+                echo "Backed up existing ${config_file}"
+            fi
+            
+            # Copy restored file
+            cp "${SHELL_CONFIGS_PATH}/${config_file}" "${USER_HOME}/"
+            echo "✓ Restored ${config_file} from backup"
+        fi
+    done
+    
+    # Set proper ownership
+    set_user_ownership "${USER_HOME}/.bashrc" 2>/dev/null || true
+    set_user_ownership "${USER_HOME}/.bash_profile" 2>/dev/null || true
+    set_user_ownership "${USER_HOME}/.bash_aliases" 2>/dev/null || true
+    set_user_ownership "${USER_HOME}/.profile" 2>/dev/null || true
+    set_user_ownership "${USER_HOME}/.zshrc" 2>/dev/null || true
+    
+    echo "✓ Restored shell configurations from backup"
+else
+    echo "No restored shell configurations found."
+    
+    # Define configuration files for user profile
+    BASH_CONFIG_FILES=(
+        "${USER_HOME}/.bashrc"
+        "${USER_HOME}/.bash_profile"
+        "${USER_HOME}/.bash_aliases"
     )
+    
+    # Handle bash configuration files using repo
+    if [[ -d "/repo/personal/core-configs" ]]; then
+        handle_installed_software_config "bash" "${BASH_CONFIG_FILES[@]}"
+    else
+        echo "No core-configs repository found. Using default shell configurations."
+    fi
+    
+    echo "✓ Set up default shell configurations"
+fi
+
+# === STAGE 11: Restore Git Configuration ===
+section "Setting Up Git Configuration"
+
+# Check if we have restored git configurations
+check_restored_configs
+
+# First try to restore git configuration from backup
+if [[ -n "${SHELL_CONFIGS_PATH}" ]] && [[ -d "${SHELL_CONFIGS_PATH}" ]]; then
+    for git_config in .gitconfig .gitignore_global .git-credentials; do
+        if [[ -f "${SHELL_CONFIGS_PATH}/${git_config}" ]]; then
+            # Back up existing file if it exists
+            if [[ -f "${USER_HOME}/${git_config}" ]]; then
+                timestamp=$(date +%Y%m%d-%H%M%S) || timestamp="backup"
+                mv "${USER_HOME}/${git_config}" "${USER_HOME}/${git_config}.orig.${timestamp}"
+                echo "Backed up existing ${git_config}"
+            fi
+            
+            # Copy restored file
+            cp "${SHELL_CONFIGS_PATH}/${git_config}" "${USER_HOME}/"
+            echo "✓ Restored ${git_config} from backup"
+        fi
+    done
+    
+    # Set proper ownership
+    set_user_ownership "${USER_HOME}/.gitconfig" 2>/dev/null || true
+    set_user_ownership "${USER_HOME}/.gitignore_global" 2>/dev/null || true
+    set_user_ownership "${USER_HOME}/.git-credentials" 2>/dev/null || true
+    
+    echo "✓ Restored Git configuration from backup"
+else
+    echo "No restored Git configuration found."
     
     # Define configuration files for Git
     GIT_CONFIG_FILES=(
         "${USER_HOME}/.gitconfig"
+        "${USER_HOME}/.gitignore_global"
     )
     
-    # Set up pre-installation configurations for SSH and Git
-    handle_pre_installation_config "ssh" "${SSH_CONFIG_FILES[@]}"
-    handle_pre_installation_config "git" "${GIT_CONFIG_FILES[@]}"
-    
-    # Ensure .ssh directory exists with proper permissions
-    mkdir -p "${USER_HOME}/.ssh"
-    chmod 700 "${USER_HOME}/.ssh"
-    
-    # Handle SSH configuration files
-    handle_installed_software_config "ssh" "${SSH_CONFIG_FILES[@]}"
-    
-    # Set proper permissions for SSH keys
-    find "${USER_HOME}/.ssh" -name "id_*" -not -name "*.pub" -exec chmod 600 {} \;
-    
-    # Set proper permissions for authorized_keys if it exists
-    if [[ -L "${USER_HOME}/.ssh/authorized_keys" ]]; then
-        chmod 600 "${USER_HOME}/.ssh/authorized_keys"
+    # Handle Git configuration files using repo
+    if [[ -d "/repo/personal/core-configs" ]]; then
+        handle_installed_software_config "git" "${GIT_CONFIG_FILES[@]}"
+    else
+        echo "No core-configs repository found. Using default Git configurations."
     fi
     
-    # Handle Git configuration files
-    handle_installed_software_config "git" "${GIT_CONFIG_FILES[@]}"
-    
-    # Set proper ownership for all created files in the user's home directory
-    set_user_ownership "${USER_HOME}/.ssh"
-    set_user_ownership "${USER_HOME}/.gitconfig" 2>/dev/null || true
-    
-    echo "✓ Created symlinks for essential configuration files"
-else
-    echo "Warning: Configuration repository directory not found."
-    echo "Skipping symlink creation."
+    echo "✓ Set up default Git configuration"
 fi
 
-# === STAGE 10: System-wide SSH Configuration ===
+# === STAGE 12: Set Up Vim Configuration from Backup ===
+section "Setting Up Vim Configuration"
+
+# Check if we have restored vim configuration
+check_restored_configs
+
+# First try to restore vim configuration from backup
+if [[ -n "${SHELL_CONFIGS_PATH}" ]] && [[ -f "${SHELL_CONFIGS_PATH}/.vimrc" ]]; then
+    # Back up existing file if it exists
+    if [[ -f "${USER_HOME}/.vimrc" ]]; then
+        timestamp=$(date +%Y%m%d-%H%M%S) || timestamp="backup"
+        mv "${USER_HOME}/.vimrc" "${USER_HOME}/.vimrc.orig.${timestamp}"
+        echo "Backed up existing .vimrc"
+    fi
+    
+    # Copy restored file
+    cp "${SHELL_CONFIGS_PATH}/.vimrc" "${USER_HOME}/"
+    set_user_ownership "${USER_HOME}/.vimrc"
+    echo "✓ Restored Vim configuration from backup"
+else
+    echo "No restored Vim configuration found."
+    
+    # Define configuration files for Vim
+    VIM_CONFIG_FILES=(
+        "${USER_HOME}/.vimrc"
+    )
+    
+    # Handle Vim configuration files using repo
+    if [[ -d "/repo/personal/core-configs" ]]; then
+        handle_installed_software_config "vim" "${VIM_CONFIG_FILES[@]}"
+    else
+        echo "No core-configs repository found. Using default Vim configuration."
+    fi
+    
+    echo "✓ Set up default Vim configuration"
+fi
+
+# === STAGE 13: Set Up System-wide SSH Configuration ===
 section "Setting up System-wide SSH Configuration"
 
 # Define system-wide SSH configuration files
@@ -693,12 +941,29 @@ else
     echo "No system-wide SSH configuration found in the repository."
 fi
 
-# === STAGE 11: Check for New Configuration Files ===
+# === STAGE 14: Check for New Configuration Files ===
 section "Checking for New Configuration Files"
 
+# Define configuration files to check
+BASH_CONFIG_FILES=(
+    "${USER_HOME}/.bashrc"
+    "${USER_HOME}/.bash_profile"
+    "${USER_HOME}/.bash_aliases"
+)
+
+GIT_CONFIG_FILES=(
+    "${USER_HOME}/.gitconfig"
+    "${USER_HOME}/.gitignore_global"
+)
+
+VIM_CONFIG_FILES=(
+    "${USER_HOME}/.vimrc"
+)
+
 # Check for any new configuration files created during installation
-check_post_installation_configs "ssh" "${SSH_CONFIG_FILES[@]}"
+check_post_installation_configs "bash" "${BASH_CONFIG_FILES[@]}"
 check_post_installation_configs "git" "${GIT_CONFIG_FILES[@]}"
+check_post_installation_configs "vim" "${VIM_CONFIG_FILES[@]}"
 check_post_installation_configs "system/ssh" "${SYSTEM_SSH_CONFIG_FILES[@]}"
 
 section "Initial Setup Complete!"

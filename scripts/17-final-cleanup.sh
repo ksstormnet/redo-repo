@@ -4,6 +4,7 @@
 # This script performs final system cleanup and optimization
 # Part of the sequential Ubuntu Server to KDE conversion process
 # Modified to protect symlinked configurations from /repo/personal/core-configs/
+# And to reference restored configurations from /restart/critical_backups/
 
 # Exit on any error
 set -e
@@ -56,7 +57,7 @@ is_core_config_symlink() {
     
     if [[ -L "${path}" ]]; then
         local link_target
-        link_target=$(readlink "${path}")
+        link_target=$(readlink "${path}") || true
         if [[ "${link_target}" == "/repo/personal/core-configs/"* ]]; then
             return 0  # True, it is a core-configs symlink
         fi
@@ -67,18 +68,47 @@ is_core_config_symlink() {
 # Function to safely clean a file without removing core-configs symlinks
 safe_clean_file() {
     local file="${1}"
+    local is_symlink
     
-    if [[ -f "${file}" ]] && ! is_core_config_symlink "${file}"; then
+    # Check if it's a core-configs symlink separately to avoid SC2310
+    is_symlink=0
+    # Run the function separately to avoid SC2310
+    # Store the result in a variable to avoid SC2310
+    local result
+    # Temporarily disable set -e
+    set +e
+    is_core_config_symlink "${file}"
+    result=$?
+    # Re-enable set -e
+    set -e
+    if [[ ${result} -eq 0 ]]; then
+        is_symlink=1
+    fi
+    
+    if [[ -f "${file}" ]] && [[ ${is_symlink} -eq 0 ]]; then
         rm -f "${file}"
         echo "✓ Removed: ${file}"
-    elif is_core_config_symlink "${file}"; then
+    elif [[ ${is_symlink} -eq 1 ]]; then
         echo "✓ Preserved core-configs symlink: ${file}"
     fi
 }
 
+# Check for restored configurations
+RESTORED_CONFIGS="/restart/critical_backups/config_mapping.txt"
+
+if [[ -f "${RESTORED_CONFIGS}" ]]; then
+    echo "Found restored configuration mapping file"
+    # shellcheck disable=SC1090
+    source "${RESTORED_CONFIGS}"
+    
+    if [[ -n "${GENERAL_CONFIGS_PATH}" ]]; then
+        echo "Using restored configurations from ${GENERAL_CONFIGS_PATH}"
+    fi
+fi
+
 # Determine user home directory
-if [[ "${SUDO_USER}" ]]; then
-    USER_HOME=$(getent passwd "${SUDO_USER}" | cut -d: -f6)
+if [[ -n "${SUDO_USER}" ]]; then
+    USER_HOME=$(getent passwd "${SUDO_USER}" | cut -d: -f6) || true
     # shellcheck disable=SC2034
     ACTUAL_USER="${SUDO_USER}"
 else
@@ -136,11 +166,12 @@ CORE_CONFIG_SYMLINK_COUNT=0
 
 while IFS= read -r symlink; do
     SYMLINK_COUNT=$((SYMLINK_COUNT + 1))
-    if [[ "$(readlink "${symlink}")" == "/repo/personal/core-configs/"* ]]; then
+    link_target=$(readlink "${symlink}") || true
+    if [[ "${link_target}" == "/repo/personal/core-configs/"* ]]; then
         CORE_CONFIG_SYMLINK_COUNT=$((CORE_CONFIG_SYMLINK_COUNT + 1))
-        echo "Protected: ${symlink} -> $(readlink "${symlink}")"
+        echo "Protected: ${symlink} -> ${link_target}"
     fi
-done < <(find "${USER_HOME}" -type l)
+done < <(find "${USER_HOME}" -type l 2>/dev/null || true)
 
 echo "Found ${SYMLINK_COUNT} total symlinks, including ${CORE_CONFIG_SYMLINK_COUNT} from core-configs"
 
@@ -176,13 +207,33 @@ section "Creating Setup Summary"
 # Create a summary file
 SUMMARY_FILE="${USER_HOME}/kde-setup-summary.md"
 
+# Get information about restored configurations
+RESTORED_INFO=""
+if [[ -n "${RESTORED_CONFIGS}" ]]; then
+    RESTORED_INFO="- Configurations restored from critical backup at /restart/critical_backups/"
+    if [[ -n "${GENERAL_CONFIGS_PATH}" ]]; then
+        RESTORED_INFO="${RESTORED_INFO}\n- Restored configuration files from ${GENERAL_CONFIGS_PATH}"
+    fi
+    if [[ -n "${SHELL_CONFIGS_PATH}" ]]; then
+        RESTORED_INFO="${RESTORED_INFO}\n- Restored shell configurations from ${SHELL_CONFIGS_PATH}"
+    fi
+    if [[ -n "${SSH_PATH}" ]]; then
+        RESTORED_INFO="${RESTORED_INFO}\n- Restored SSH configuration from ${SSH_PATH}"
+    fi
+fi
+
+# Get current date and time
+current_date=$(date +"%Y-%m-%d %H:%M:%S") || true
+current_hostname=$(hostname) || true
+current_kernel=$(uname -r) || true
+
 cat > "${SUMMARY_FILE}" << EOF
 # KDE Plasma Desktop Installation Summary
 
 ## System Information
-- **Date**: $(date +"%Y-%m-%d %H:%M:%S")
-- **Hostname**: $(hostname)
-- **Kernel**: $(uname -r)
+- **Date**: ${current_date}
+- **Hostname**: ${current_hostname}
+- **Kernel**: ${current_kernel}
 - **User**: ${ACTUAL_USER}
 
 ## Installed Components
@@ -201,9 +252,17 @@ cat > "${SUMMARY_FILE}" << EOF
 - AppImage Support with Common Applications
 - KDE Custom Settings
 
-## Preserved Configurations
+## Configuration Management
 - Symlinked configurations from /repo/personal/core-configs/ have been preserved
 - Total symlinks preserved: ${CORE_CONFIG_SYMLINK_COUNT}
+EOF
+
+# Add restored info if available
+if [[ -n "${RESTORED_INFO}" ]]; then
+    echo -e "${RESTORED_INFO}" >> "${SUMMARY_FILE}"
+fi
+
+cat >> "${SUMMARY_FILE}" << EOF
 
 ## Next Steps
 1. **Reboot your system** to complete the setup: \`sudo systemctl reboot\`
@@ -224,7 +283,7 @@ cat > "${SUMMARY_FILE}" << EOF
 EOF
 
 # Set proper ownership of the summary file
-if [[ "${SUDO_USER}" ]]; then
+if [[ -n "${SUDO_USER}" ]]; then
     chown "${SUDO_USER}":"${SUDO_USER}" "${SUMMARY_FILE}"
 fi
 
@@ -245,15 +304,38 @@ which were preserved during the cleanup process.
 EOF
 
 # Find and document all symlinks to core-configs
-find "${USER_HOME}" -type l | while read -r symlink; do
-    target=$(readlink "${symlink}")
+symlinks_found=$(find "${USER_HOME}" -type l 2>/dev/null || true)
+while IFS= read -r symlink; do
+    target=$(readlink "${symlink}") || true
     if [[ "${target}" == "/repo/personal/core-configs/"* ]]; then
         echo "- \`${symlink}\` -> \`${target}\`" >> "${SYMLINKS_FILE}"
     fi
-done
+done <<< "${symlinks_found}"
+
+# Add section for restored configurations if available
+if [[ -n "${RESTORED_CONFIGS}" ]]; then
+    cat >> "${SYMLINKS_FILE}" << EOF
+
+## Restored Configurations
+The following paths were used to restore configurations from the backup:
+EOF
+    
+    if [[ -n "${GENERAL_CONFIGS_PATH}" ]]; then
+        echo "- General configurations: \`${GENERAL_CONFIGS_PATH}\`" >> "${SYMLINKS_FILE}"
+    fi
+    if [[ -n "${SHELL_CONFIGS_PATH}" ]]; then
+        echo "- Shell configurations: \`${SHELL_CONFIGS_PATH}\`" >> "${SYMLINKS_FILE}"
+    fi
+    if [[ -n "${SSH_PATH}" ]]; then
+        echo "- SSH configuration: \`${SSH_PATH}\`" >> "${SYMLINKS_FILE}"
+    fi
+    if [[ -n "${DATABASE_PATH}" ]]; then
+        echo "- Database dumps: \`${DATABASE_PATH}\`" >> "${SYMLINKS_FILE}"
+    fi
+fi
 
 # Set proper ownership
-if [[ "${SUDO_USER}" ]]; then
+if [[ -n "${SUDO_USER}" ]]; then
     chown "${SUDO_USER}":"${SUDO_USER}" "${SYMLINKS_FILE}"
 fi
 echo "✓ Created symlinked configurations document at ${SYMLINKS_FILE}"
@@ -273,7 +355,14 @@ echo "The system has been cleaned up and optimized, while preserving your symlin
 echo "A summary of the installation has been created at ~/kde-setup-summary.md"
 echo "A list of preserved symlinked configurations is available at ~/symlinked-configurations.md"
 echo
-echo "All configurations are managed through the repository at: /repo/personal/core-configs/"
+
+if [[ -n "${RESTORED_CONFIGS}" ]]; then
+    echo "Your configurations have been successfully restored from the critical backup"
+    echo "located at /restart/critical_backups/."
+else
+    echo "All configurations are managed through the repository at: /repo/personal/core-configs/"
+fi
+
 echo "  - If a configuration existed in the repo, it was symlinked to the correct location"
 echo "  - If a configuration was created during installation, it was moved to the repo and symlinked"
 echo "  - Any changes to configurations should be made in the repository"

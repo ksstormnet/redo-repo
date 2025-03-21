@@ -15,71 +15,73 @@ handle_installed_software_config() {
     local commit_needed=false
     local added_configs=()
     
-    echo "Managing configuration for $software_name..."
+    echo "Managing configuration for ${software_name}..."
     
     # Ensure the repository directory exists
-    if [ ! -d "$repo_dir" ]; then
-        echo "ERROR: Configuration repository not found at $repo_dir"
+    if [[ ! -d "${repo_dir}" ]]; then
+        echo "ERROR: Configuration repository not found at ${repo_dir}"
         echo "Please ensure the repository is mounted or cloned at this location."
         return 1
     fi
     
     # Create software-specific directory in the repo if it doesn't exist
     local software_dir="${repo_dir}/${software_name}"
-    mkdir -p "$software_dir"
+    mkdir -p "${software_dir}"
     
     # Process each config file
     for config_file in "${config_files[@]}"; do
         # Skip if the path is empty
-        if [ -z "$config_file" ]; then
+        if [[ -z "${config_file}" ]]; then
             continue
         fi
         
         # Get the filename and create the target path in the repo
         local filename
-        filename=$(basename "$config_file")
+        filename=$(basename "${config_file}") || true
         local repo_config="${software_dir}/${filename}"
         
         # Check if the config exists in the repo
-        if [ -e "$repo_config" ]; then
-            echo "Config file exists in repo: $repo_config"
+        if [[ -e "${repo_config}" ]]; then
+            echo "Config file exists in repo: ${repo_config}"
             
             # If the original config exists and is not a symlink, back it up and remove it
-            if [ -e "$config_file" ] && [ ! -L "$config_file" ]; then
-                echo "Backing up existing config: $config_file → ${config_file}.orig.$(date +%Y%m%d-%H%M%S)"
-                mv "$config_file" "${config_file}.orig.$(date +%Y%m%d-%H%M%S)"
-            elif [ -L "$config_file" ]; then
+            if [[ -e "${config_file}" ]] && [[ ! -L "${config_file}" ]]; then
+                local timestamp
+                timestamp=$(date +%Y%m%d-%H%M%S) || true
+                echo "Backing up existing config: ${config_file} → ${config_file}.orig.${timestamp}"
+                mv "${config_file}" "${config_file}.orig.${timestamp}"
+            elif [[ -L "${config_file}" ]]; then
                 # If it's already a symlink, remove it
-                echo "Removing existing symlink: $config_file"
-                rm "$config_file"
+                echo "Removing existing symlink: ${config_file}"
+                rm "${config_file}"
             fi
             
             # Create parent directory if it doesn't exist
-            mkdir -p "$(dirname "$config_file")"
+            mkdir -p "$(dirname "${config_file}")" || true
             
             # Create symlink from original location to repo
-            echo "Creating symlink: $config_file → $repo_config"
-            ln -sf "$repo_config" "$config_file"
+            echo "Creating symlink: ${config_file} → ${repo_config}"
+            ln -sf "${repo_config}" "${config_file}"
         else
             # Config doesn't exist in repo, but exists in the system
-            if [ -e "$config_file" ] && [ ! -L "$config_file" ]; then
-                echo "Moving config to repo: $config_file → $repo_config"
+            if [[ -e "${config_file}" ]] && [[ ! -L "${config_file}" ]]; then
+                echo "Moving config to repo: ${config_file} → ${repo_config}"
                 
                 # Create parent directory in repo if needed
-                mkdir -p "$(dirname "$repo_config")"
+                mkdir -p "$(dirname "${repo_config}")" || true
                 
                 # Move the config file to the repo
-                cp -a "$config_file" "$repo_config"
+                cp -a "${config_file}" "${repo_config}"
                 
                 # Remove the original and create a symlink
-                rm "$config_file"
-                ln -sf "$repo_config" "$config_file"
+                rm "${config_file}"
+                ln -sf "${repo_config}" "${config_file}"
                 
                 # Mark for commit
                 commit_needed=true
-                added_configs+=("$filename")
+                added_configs+=("${filename}")
             else
-                echo "Config file not found: $config_file"
+                echo "Config file not found: ${config_file}"
             fi
         fi
     done
@@ -110,8 +112,8 @@ handle_pre_installation_config() {
     echo "Setting up pre-installation configuration for ${software_name}..."
     
     # Ensure the repository directory exists
-    if [ ! -d "$repo_dir" ]; then
-        echo "ERROR: Configuration repository not found at $repo_dir"
+    if [[ ! -d "${repo_dir}" ]]; then
+        echo "ERROR: Configuration repository not found at ${repo_dir}"
         echo "Please ensure the repository is mounted or cloned at this location."
         return 1
     fi
@@ -128,25 +130,25 @@ handle_pre_installation_config() {
     # Process each config file
     for config_file in "${config_files[@]}"; do
         # Skip if the path is empty
-        if [ -z "$config_file" ]; then
+        if [[ -z "${config_file}" ]]; then
             continue
         fi
         
         # Get the filename and create the source path in the repo
         local filename
-        filename=$(basename "$config_file")
+        filename=$(basename "${config_file}") || true
         local repo_config="${software_dir}/${filename}"
         
         # Check if the config exists in the repo
-        if [ -e "$repo_config" ]; then
-            echo "Config file exists in repo: $repo_config"
+        if [[ -e "${repo_config}" ]]; then
+            echo "Config file exists in repo: ${repo_config}"
             
             # Create parent directory if it doesn't exist
-            mkdir -p "$(dirname "$config_file")"
+            mkdir -p "$(dirname "${config_file}")" || true
             
             # Create symlink from repo to original location
-            echo "Creating symlink: $config_file → $repo_config"
-            ln -sf "$repo_config" "$config_file"
+            echo "Creating symlink: ${config_file} → ${repo_config}"
+            ln -sf "${repo_config}" "${config_file}"
         fi
     done
     
@@ -166,45 +168,45 @@ check_post_installation_configs() {
     echo "Checking for new configuration files after ${software_name} installation..."
     
     # Ensure the repository directory exists
-    if [ ! -d "$repo_dir" ]; then
-        echo "ERROR: Configuration repository not found at $repo_dir"
+    if [[ ! -d "${repo_dir}" ]]; then
+        echo "ERROR: Configuration repository not found at ${repo_dir}"
         echo "Please ensure the repository is mounted or cloned at this location."
         return 1
     fi
     
     # Create software-specific directory in the repo if it doesn't exist
     local software_dir="${repo_dir}/${software_name}"
-    mkdir -p "$software_dir"
+    mkdir -p "${software_dir}"
     
     # Process each config file
     for config_file in "${config_files[@]}"; do
         # Skip if the path is empty
-        if [ -z "$config_file" ]; then
+        if [[ -z "${config_file}" ]]; then
             continue
         fi
         
         # Get the filename and create the target path in the repo
         local filename
-        filename=$(basename "$config_file")
+        filename=$(basename "${config_file}") || true
         local repo_config="${software_dir}/${filename}"
         
         # Check if the config exists in the system but not in the repo
-        if [ -e "$config_file" ] && [ ! -L "$config_file" ] && [ ! -e "$repo_config" ]; then
-            echo "New config file found: $config_file"
+        if [[ -e "${config_file}" ]] && [[ ! -L "${config_file}" ]] && [[ ! -e "${repo_config}" ]]; then
+            echo "New config file found: ${config_file}"
             
             # Create parent directory in repo if needed
-            mkdir -p "$(dirname "$repo_config")"
+            mkdir -p "$(dirname "${repo_config}")" || true
             
             # Move the config file to the repo
-            cp -a "$config_file" "$repo_config"
+            cp -a "${config_file}" "${repo_config}"
             
             # Remove the original and create a symlink
-            rm "$config_file"
-            ln -sf "$repo_config" "$config_file"
+            rm "${config_file}"
+            ln -sf "${repo_config}" "${config_file}"
             
             # Mark for commit
             commit_needed=true
-            added_configs+=("$filename")
+            added_configs+=("${filename}")
         fi
     done
     

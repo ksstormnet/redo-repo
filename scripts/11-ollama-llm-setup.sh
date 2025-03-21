@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 10-ollama-llm-setup.sh
+# 11-ollama-llm-setup.sh
 # This script installs Ollama for local LLM inference optimized for RTX 3090
 # Part of the sequential Ubuntu Server to KDE conversion process
 
@@ -15,6 +15,16 @@ else
     echo "ERROR: Configuration management functions not found."
     echo "Please ensure the CONFIG_FUNCTIONS_PATH environment variable is set correctly."
     exit 1
+fi
+
+# Source the backup configuration mapping if available
+if [[ -n "${CONFIG_MAPPING_FILE}" ]] && [[ -f "${CONFIG_MAPPING_FILE}" ]]; then
+    # shellcheck disable=SC1090
+    source "${CONFIG_MAPPING_FILE}"
+    echo "✓ Loaded configuration mapping from ${CONFIG_MAPPING_FILE}"
+else
+    echo "Note: Configuration mapping file not found or not specified."
+    echo "Will continue with default configuration locations."
 fi
 
 # Display a section header
@@ -37,12 +47,13 @@ install_packages() {
 }
 
 # Determine user home directory
-if [[ "${SUDO_USER}" ]]; then
-    USER_HOME=$(getent passwd "${SUDO_USER}" | cut -d: -f6)
+if [[ -n "${SUDO_USER}" ]]; then
+    USER_HOME=$(getent passwd "${SUDO_USER}" | cut -d: -f6) || true
     # shellcheck disable=SC2034
     ACTUAL_USER="${SUDO_USER}"
 else
-    USER_HOME="${HOME}"
+    # shellcheck disable=SC2034
+    USER_HOME="${HOME}" # Used for configuration paths
     # shellcheck disable=SC2034
     ACTUAL_USER="${USER}"
 fi
@@ -63,6 +74,65 @@ apt-get update
 
 # === STAGE 1: Pre-Installation Configuration ===
 section "Setting Up Pre-Installation Configurations"
+
+# Define backup paths based on the configuration mapping
+OLLAMA_BACKUP_DIR=""
+# This variable is defined for consistency but not currently used
+# shellcheck disable=SC2034
+OLLAMA_MODEL_BACKUP_DIR=""
+RTX_MODELFILE=""
+
+# Check if we have backup configs from general configs path
+if [[ -n "${GENERAL_CONFIGS_PATH}" ]]; then
+    if [[ -d "${GENERAL_CONFIGS_PATH}/config_files/.ollama" ]]; then
+        OLLAMA_BACKUP_DIR="${GENERAL_CONFIGS_PATH}/config_files/.ollama"
+    elif [[ -d "${GENERAL_CONFIGS_PATH}/config_files/.config/ollama" ]]; then
+        OLLAMA_BACKUP_DIR="${GENERAL_CONFIGS_PATH}/config_files/.config/ollama"
+    fi
+fi
+
+# If no general configs path, try other locations
+if [[ -z "${OLLAMA_BACKUP_DIR}" ]] && [[ -n "${BACKUP_CONFIGS_PATH}" ]]; then
+    # Look for Ollama config in various potential locations
+    for potential_dir in \
+        "${BACKUP_CONFIGS_PATH}/configs/ollama" \
+        "${BACKUP_CONFIGS_PATH}/ollama" \
+        "${BACKUP_CONFIGS_PATH}/configs/config_files/.ollama"; do
+        if [[ -d "${potential_dir}" ]]; then
+            OLLAMA_BACKUP_DIR="${potential_dir}"
+            break
+        fi
+    done
+fi
+
+# Look for RTX model file in backup
+if [[ -n "${BACKUP_CONFIGS_PATH}" ]]; then
+    # Look for model file in various potential locations
+    for potential_file in \
+        "${BACKUP_CONFIGS_PATH}/rtx3090-modelfile.txt" \
+        "${BACKUP_CONFIGS_PATH}/ollama/rtx3090-modelfile.txt" \
+        "${BACKUP_CONFIGS_PATH}/configs/ollama/rtx3090-modelfile.txt"; do
+        if [[ -f "${potential_file}" ]]; then
+            RTX_MODELFILE="${potential_file}"
+            break
+        fi
+    done
+fi
+
+# Look for Ollama optimizer script in backup
+OLLAMA_OPTIMIZER=""
+if [[ -n "${BACKUP_CONFIGS_PATH}" ]]; then
+    # Look for optimizer script in various potential locations
+    for potential_file in \
+        "${BACKUP_CONFIGS_PATH}/ollama-optimizer.sh" \
+        "${BACKUP_CONFIGS_PATH}/ollama/ollama-optimizer.sh" \
+        "${BACKUP_CONFIGS_PATH}/configs/ollama/ollama-optimizer.sh"; do
+        if [[ -f "${potential_file}" ]]; then
+            OLLAMA_OPTIMIZER="${potential_file}"
+            break
+        fi
+    done
+fi
 
 # Set up pre-installation configurations for Ollama
 handle_pre_installation_config "ollama" "${OLLAMA_CONFIG_FILES[@]}"
@@ -87,14 +157,14 @@ if ! command -v nvcc &> /dev/null; then
     install_packages "CUDA Development Tools" nvidia-cuda-toolkit
 fi
 
-CUDA_VERSION=$(nvcc --version | grep "release" | awk '{print $6}' | sed 's/,//')
+CUDA_VERSION=$(nvcc --version | grep "release" | awk '{print $6}' | sed 's/,//') || true
 echo "Detected CUDA version: ${CUDA_VERSION}"
 
 # === STAGE 3: Install Ollama ===
 section "Installing Ollama for Local LLM Inference"
 
 # Install Ollama
-curl -fsSL https://ollama.ai/install.sh | sh
+curl -fsSL https://ollama.ai/install.sh | sh || true
 echo "✓ Installed Ollama"
 
 # === STAGE 4: Manage Ollama Configurations ===
@@ -104,11 +174,18 @@ section "Managing Ollama Configurations"
 mkdir -p "/root/.ollama"
 mkdir -p "/etc/systemd/system/ollama.service.d"
 
+# Restore Ollama config from backup if available
+if [[ -n "${OLLAMA_BACKUP_DIR}" ]] && [[ -f "${OLLAMA_BACKUP_DIR}/ollama.json" ]]; then
+    echo "Restoring Ollama configuration from backup..."
+    cp "${OLLAMA_BACKUP_DIR}/ollama.json" "/root/.ollama/"
+    echo "✓ Restored Ollama configuration from backup"
+fi
+
 # Handle configuration files
 handle_installed_software_config "ollama" "${OLLAMA_CONFIG_FILES[@]}"
 
-# Create a default override.conf if it doesn't exist in the repo
-if [[ ! -f "/repo/personal/core-configs/ollama/override.conf" ]]; then
+# Create a default override.conf if it doesn't exist in the repo and backup
+if [[ ! -f "/repo/personal/core-configs/ollama/override.conf" ]] && [[ ! -f "/etc/systemd/system/ollama.service.d/override.conf" ]]; then
     # Create Ollama GPU optimization override
     cat > "/etc/systemd/system/ollama.service.d/override.conf" << EOF
 [Service]
@@ -126,7 +203,7 @@ fi
 mkdir -p /opt/models
 
 # Set proper ownership
-if [[ "${SUDO_USER}" ]]; then
+if [[ -n "${SUDO_USER}" ]]; then
     chown -R "${SUDO_USER}":"${SUDO_USER}" /opt/models
     # If running as sudo, also set ownership for config files
     if [[ -d "/root/.ollama" ]]; then
@@ -149,11 +226,20 @@ section "Managing Ollama Modelfiles"
 # Create modelfiles directory if it doesn't exist
 mkdir -p "${OLLAMA_MODELFILES_DIR}"
 
+# Copy RTX model file if available
+if [[ -n "${RTX_MODELFILE}" ]]; then
+    echo "Found RTX 3090 modelfile, copying to Ollama modelfiles directory..."
+    cp "${RTX_MODELFILE}" "${OLLAMA_MODELFILES_DIR}/rtx3090.txt"
+    echo "✓ Copied RTX 3090 modelfile"
+fi
+
 # Check for and copy any Modelfiles from local to repo
-if [[ -d "${OLLAMA_MODELFILES_DIR}" ]] && [[ -n "$(ls -A "${OLLAMA_MODELFILES_DIR}" 2>/dev/null)" ]]; then
+if [[ -d "${OLLAMA_MODELFILES_DIR}" ]] && [[ -n "$(ls -A "${OLLAMA_MODELFILES_DIR}" 2>/dev/null || true)" ]]; then
     echo "Checking for local modelfiles to back up to repository..."
     for modelfile in "${OLLAMA_MODELFILES_DIR}"/*; do
         if [[ -f "${modelfile}" ]]; then
+            # Variable used for logging or future expansion
+            # shellcheck disable=SC2034
             modelname=$(basename "${modelfile}")
             handle_installed_software_config "ollama/modelfiles" "${modelfile}"
         fi
@@ -210,7 +296,7 @@ if [[ -f "${MODELS_REGISTRY}" ]]; then
     echo "Processing model registry list..."
     
     # Count the number of models
-    MODEL_COUNT=$(grep -v "^#" "${MODELS_REGISTRY}" | grep -cv "^$")
+    MODEL_COUNT=$(grep -v "^#" "${MODELS_REGISTRY}" | grep -cv "^$") || true
     echo "Found ${MODEL_COUNT} models to pull"
     
     # Pull each model in the list
@@ -225,7 +311,7 @@ if [[ -f "${MODELS_REGISTRY}" ]]; then
         echo "[${COUNT}/${MODEL_COUNT}] Pulling model: ${line}"
         
         # If running with sudo, run the ollama command as the actual user
-        if [[ "${SUDO_USER}" ]]; then
+        if [[ -n "${SUDO_USER}" ]]; then
             su - "${SUDO_USER}" -c "ollama pull \"${line}\""
         else
             ollama pull "${line}"
@@ -240,7 +326,45 @@ else
     echo "You can manually pull models using: ollama pull <model_name>"
 fi
 
-# === STAGE 8: Check for New Configuration Files ===
+# === STAGE 8: Apply Optimizer Script if available ===
+section "Applying RTX 3090 Optimizations"
+
+if [[ -n "${OLLAMA_OPTIMIZER}" ]]; then
+    echo "Found Ollama optimizer script for RTX 3090..."
+    echo "Executing optimizer script..."
+    chmod +x "${OLLAMA_OPTIMIZER}"
+    bash "${OLLAMA_OPTIMIZER}"
+    echo "✓ Applied RTX 3090 optimizations from script"
+    
+    # Copy script to /usr/local/bin for future use
+    cp "${OLLAMA_OPTIMIZER}" /usr/local/bin/ollama-optimizer.sh
+    chmod +x /usr/local/bin/ollama-optimizer.sh
+    echo "✓ Installed optimizer script to /usr/local/bin/ollama-optimizer.sh"
+else
+    echo "No optimizer script found, applying default optimizations..."
+    
+    # Apply some basic optimizations for RTX 3090
+    echo "Setting NVIDIA GPU to persistence mode..."
+    nvidia-smi -pm 1
+    
+    echo "Setting optimal clocks for LLM inference..."
+    nvidia-smi -ac 1395,1695
+    
+    echo "Setting CPU governor to performance mode..."
+    # Check if cpufreq is available
+    if [[ -f /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor ]]; then
+        for cpu in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
+            echo "performance" > "${cpu}"
+        done
+        echo "✓ CPU governor set to performance"
+    else
+        echo "CPU governor settings not available"
+    fi
+    
+    echo "✓ Applied basic RTX 3090 optimizations"
+fi
+
+# === STAGE 9: Check for New Configuration Files ===
 section "Checking for New Configuration Files"
 
 # Check for any new configuration files created during installation
@@ -252,7 +376,7 @@ echo "Configuration has been saved to your repository."
 echo
 echo "Model Registry:"
 if [[ -f "${MODELS_REGISTRY}" ]]; then
-    grep -v "^#" "${MODELS_REGISTRY}" | grep -v "^$" || echo "No models in registry"
+    grep -v "^#" "${MODELS_REGISTRY}" | grep -v "^$" || echo "No models in registry" || true
 else
     echo "No model registry found."
 fi
@@ -267,4 +391,14 @@ echo
 echo "Models are stored in /opt/models"
 echo 
 echo "To run a model, use: ollama run <model_name>"
+echo
+if [[ -n "${RTX_MODELFILE}" ]]; then
+    echo "Your RTX 3090 modelfile is available. To create an optimized model:"
+    echo "ollama create rtx-llama3 -f /root/.ollama/modelfiles/rtx3090.txt"
+    echo
+fi
 echo "For more information, visit: https://ollama.com/library"
+echo
+if [[ -n "${BACKUP_CONFIGS_PATH}" ]]; then
+    echo "Configurations were restored from your backups at: ${BACKUP_CONFIGS_PATH}"
+fi

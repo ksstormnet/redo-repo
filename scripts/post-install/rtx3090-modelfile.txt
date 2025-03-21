@@ -1,0 +1,28 @@
+FROM llama3
+
+# Model configuration for RTX 3090 (24GB VRAM)
+# Replace llama3 with your preferred base model
+
+# Performance Parameters
+PARAMETER num_gpu 99        # Use all available GPU memory
+PARAMETER gpu_layers 43     # Maximum layers to offload to GPU
+PARAMETER num_thread 8      # Adjust based on your CPU cores
+PARAMETER batch_size 512    # Increase throughput
+
+# Memory Optimization
+PARAMETER context_length 8192    # Adjust based on your needs
+PARAMETER num_keep 48            # Token window to keep in context
+
+# Quality Parameters
+PARAMETER temperature 0.7   # Lower for more deterministic responses
+PARAMETER top_p 0.9         # Nucleus sampling parameter
+PARAMETER top_k 40          # Limit vocabulary to top K tokens
+PARAMETER repeat_penalty 1.1  # Penalize repetition
+
+# Advanced Parameters (optional)
+# PARAMETER mirostat 2        # Dynamic temperature control
+# PARAMETER mirostat_tau 5.0  # Target entropy
+# PARAMETER mirostat_eta 0.1  # Learning rate
+
+# System Prompt (optional)
+# SYSTEM """You are an AI assistant running on a local RTX 3090."""

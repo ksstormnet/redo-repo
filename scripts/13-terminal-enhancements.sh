@@ -3,6 +3,7 @@
 # 12-terminal-enhancements.sh
 # This script installs additional terminal utilities and enhancements
 # Part of the sequential Ubuntu Server to KDE conversion process
+# Modified to use restored configurations from /restart/critical_backups
 
 # Exit on any error
 set -e
@@ -37,14 +38,29 @@ install_packages() {
 }
 
 # Determine user home directory
-if [[ "${SUDO_USER}" ]]; then
-    USER_HOME=$(getent passwd "${SUDO_USER}" | cut -d: -f6)
+if [[ -n "${SUDO_USER}" ]]; then
+    USER_HOME=$(getent passwd "${SUDO_USER}" | cut -d: -f6) || true
     # shellcheck disable=SC2034
     ACTUAL_USER="${SUDO_USER}"
 else
+    # shellcheck disable=SC2034
     USER_HOME="${HOME}"
     # shellcheck disable=SC2034
     ACTUAL_USER="${USER}"
+fi
+
+# Check for restored configurations
+CONFIG_MAPPING="/restart/critical_backups/config_mapping.txt"
+RESTORED_CONFIGS_AVAILABLE=false
+
+if [[ -f "${CONFIG_MAPPING}" ]]; then
+    echo "Found restored configuration mapping at ${CONFIG_MAPPING}"
+    # shellcheck disable=SC1090
+    source "${CONFIG_MAPPING}"
+    RESTORED_CONFIGS_AVAILABLE=true
+else
+    echo "No restored configuration mapping found at ${CONFIG_MAPPING}"
+    echo "Will proceed with default configurations."
 fi
 
 # Define configuration files for each terminal utility
@@ -121,8 +137,35 @@ install_packages "Shell Utilities" \
 # === STAGE 4: Setup Default Tmux Configuration ===
 section "Setting Up Default Tmux Configuration"
 
-# Create a basic tmux configuration if it doesn't exist in the repo
-if ! handle_installed_software_config "tmux" "${TMUX_CONFIG_FILES[@]}"; then
+# Check for restored tmux configuration
+RESTORED_TMUX_CONF=""
+if [[ "${RESTORED_CONFIGS_AVAILABLE}" = true ]]; then
+    POSSIBLE_TMUX_PATHS=(
+        "${GENERAL_CONFIGS_PATH}/home/.tmux.conf"
+        "${HOME_CONFIGS_PATH}/.tmux.conf"
+        "${SHELL_CONFIGS_PATH}/.tmux.conf"
+    )
+    
+    for path in "${POSSIBLE_TMUX_PATHS[@]}"; do
+        if [[ -f "${path}" ]]; then
+            RESTORED_TMUX_CONF="${path}"
+            echo "Found restored tmux configuration at ${RESTORED_TMUX_CONF}"
+            break
+        fi
+    done
+fi
+
+# Create a basic tmux configuration if it doesn't exist in the repo or restored configs
+if [[ -n "${RESTORED_TMUX_CONF}" ]]; then
+    echo "Using restored tmux configuration..."
+    cp "${RESTORED_TMUX_CONF}" "${USER_HOME}/.tmux.conf"
+    
+    # Set proper ownership
+    if [[ -n "${SUDO_USER}" ]]; then
+        chown "${SUDO_USER}":"${SUDO_USER}" "${USER_HOME}/.tmux.conf"
+    fi
+    echo "✓ Restored tmux configuration from backup"
+elif ! handle_installed_software_config "tmux" "${TMUX_CONFIG_FILES[@]}"; then
     # Create a basic tmux.conf if it doesn't exist
     if [[ ! -f "${USER_HOME}/.tmux.conf" ]]; then
         cat > "${USER_HOME}/.tmux.conf" << 'EOF'
@@ -161,7 +204,7 @@ bind -n M-Down select-pane -D
 EOF
         
         # Set proper ownership
-        if [[ "${SUDO_USER}" ]]; then
+        if [[ -n "${SUDO_USER}" ]]; then
             chown "${SUDO_USER}":"${SUDO_USER}" "${USER_HOME}/.tmux.conf"
         fi
         echo "✓ Created basic tmux configuration"
@@ -174,19 +217,222 @@ fi
 # === STAGE 5: Manage Terminal Utility Configurations ===
 section "Managing Terminal Utility Configurations"
 
-# Handle configuration files for terminal utilities
-handle_installed_software_config "ranger" "${RANGER_CONFIG_FILES[@]}"
-handle_installed_software_config "nnn" "${NNN_CONFIG_FILES[@]}"
-handle_installed_software_config "btop" "${BTOP_CONFIG_FILES[@]}"
+# Check for restored ranger configuration
+RESTORED_RANGER=false
+if [[ "${RESTORED_CONFIGS_AVAILABLE}" = true ]]; then
+    RANGER_DIR_PATHS=(
+        "${GENERAL_CONFIGS_PATH}/home/.config/ranger"
+        "${HOME_CONFIGS_PATH}/.config/ranger"
+    )
+    
+    for path in "${RANGER_DIR_PATHS[@]}"; do
+        if [[ -d "${path}" ]]; then
+            echo "Found restored ranger configuration at ${path}"
+            mkdir -p "${USER_HOME}/.config/ranger"
+            cp -r "${path}"/* "${USER_HOME}/.config/ranger/"
+            RESTORED_RANGER=true
+            break
+        fi
+    done
+    
+    if [[ "${RESTORED_RANGER}" = true ]]; then
+        # Set proper ownership
+        if [[ -n "${SUDO_USER}" ]]; then
+            chown -R "${SUDO_USER}":"${SUDO_USER}" "${USER_HOME}/.config/ranger"
+        fi
+        echo "✓ Restored ranger configuration from backup"
+    fi
+fi
 
-# === STAGE 6: Check for New Configuration Files ===
+# If not restored from backup, handle ranger configuration normally
+if [[ "${RESTORED_RANGER}" = false ]]; then
+    handle_installed_software_config "ranger" "${RANGER_CONFIG_FILES[@]}"
+fi
+
+# Check for restored nnn configuration
+RESTORED_NNN=false
+if [[ "${RESTORED_CONFIGS_AVAILABLE}" = true ]]; then
+    NNN_PATHS=(
+        "${GENERAL_CONFIGS_PATH}/home/.nnnrc"
+        "${HOME_CONFIGS_PATH}/.nnnrc"
+        "${SHELL_CONFIGS_PATH}/.nnnrc"
+    )
+    
+    for path in "${NNN_PATHS[@]}"; do
+        if [[ -f "${path}" ]]; then
+            echo "Found restored nnn configuration at ${path}"
+            cp "${path}" "${USER_HOME}/.nnnrc"
+            RESTORED_NNN=true
+            break
+        fi
+    done
+    
+    if [[ "${RESTORED_NNN}" = true ]]; then
+        # Set proper ownership
+        if [[ -n "${SUDO_USER}" ]]; then
+            chown "${SUDO_USER}":"${SUDO_USER}" "${USER_HOME}/.nnnrc"
+        fi
+        echo "✓ Restored nnn configuration from backup"
+    fi
+fi
+
+# If not restored from backup, handle nnn configuration normally
+if [[ "${RESTORED_NNN}" = false ]]; then
+    handle_installed_software_config "nnn" "${NNN_CONFIG_FILES[@]}"
+fi
+
+# Check for restored btop configuration
+RESTORED_BTOP=false
+if [[ "${RESTORED_CONFIGS_AVAILABLE}" = true ]]; then
+    BTOP_PATHS=(
+        "${GENERAL_CONFIGS_PATH}/home/.config/btop"
+        "${HOME_CONFIGS_PATH}/.config/btop"
+    )
+    
+    for path in "${BTOP_PATHS[@]}"; do
+        if [[ -d "${path}" ]]; then
+            echo "Found restored btop configuration at ${path}"
+            mkdir -p "${USER_HOME}/.config/btop"
+            cp -r "${path}"/* "${USER_HOME}/.config/btop/"
+            RESTORED_BTOP=true
+            break
+        fi
+    done
+    
+    if [[ "${RESTORED_BTOP}" = true ]]; then
+        # Set proper ownership
+        if [[ -n "${SUDO_USER}" ]]; then
+            chown -R "${SUDO_USER}":"${SUDO_USER}" "${USER_HOME}/.config/btop"
+        fi
+        echo "✓ Restored btop configuration from backup"
+    fi
+fi
+
+# If not restored from backup, handle btop configuration normally
+if [[ "${RESTORED_BTOP}" = false ]]; then
+    handle_installed_software_config "btop" "${BTOP_CONFIG_FILES[@]}"
+fi
+
+# === STAGE 6: Install and Configure Additional Tools ===
+section "Installing and Configuring Additional Tools"
+
+# Check for restored configuration for additional tools
+RESTORED_TOOLS=()
+
+# Check for zsh customization files
+if [[ "${RESTORED_CONFIGS_AVAILABLE}" = true ]]; then
+    # Check for .zshrc
+    ZSH_PATHS=(
+        "${GENERAL_CONFIGS_PATH}/home/.zshrc"
+        "${HOME_CONFIGS_PATH}/.zshrc"
+        "${SHELL_CONFIGS_PATH}/.zshrc"
+    )
+    
+    for path in "${ZSH_PATHS[@]}"; do
+        if [[ -f "${path}" ]]; then
+            echo "Found restored .zshrc at ${path}"
+            cp "${path}" "${USER_HOME}/.zshrc"
+            RESTORED_TOOLS+=("zsh")
+            # Set proper ownership
+            if [[ -n "${SUDO_USER}" ]]; then
+                chown "${SUDO_USER}":"${SUDO_USER}" "${USER_HOME}/.zshrc"
+            fi
+            break
+        fi
+    done
+    
+    # Check for Starship config
+    STARSHIP_PATHS=(
+        "${GENERAL_CONFIGS_PATH}/home/.config/starship.toml"
+        "${HOME_CONFIGS_PATH}/.config/starship.toml"
+    )
+    
+    for path in "${STARSHIP_PATHS[@]}"; do
+        if [[ -f "${path}" ]]; then
+            echo "Found restored starship.toml at ${path}"
+            mkdir -p "${USER_HOME}/.config"
+            cp "${path}" "${USER_HOME}/.config/starship.toml"
+            RESTORED_TOOLS+=("starship")
+            # Set proper ownership
+            if [[ -n "${SUDO_USER}" ]]; then
+                chown "${SUDO_USER}":"${SUDO_USER}" "${USER_HOME}/.config/starship.toml"
+            fi
+            break
+        fi
+    done
+    
+    # Check for bat config
+    BAT_PATHS=(
+        "${GENERAL_CONFIGS_PATH}/home/.config/bat"
+        "${HOME_CONFIGS_PATH}/.config/bat"
+    )
+    
+    for path in "${BAT_PATHS[@]}"; do
+        if [[ -d "${path}" ]]; then
+            echo "Found restored bat configuration at ${path}"
+            mkdir -p "${USER_HOME}/.config/bat"
+            cp -r "${path}"/* "${USER_HOME}/.config/bat/"
+            RESTORED_TOOLS+=("bat")
+            # Set proper ownership
+            if [[ -n "${SUDO_USER}" ]]; then
+                chown -R "${SUDO_USER}":"${SUDO_USER}" "${USER_HOME}/.config/bat"
+            fi
+            break
+        fi
+    done
+    
+    # Check for fzf config
+    FZF_PATHS=(
+        "${GENERAL_CONFIGS_PATH}/home/.fzf.bash"
+        "${HOME_CONFIGS_PATH}/.fzf.bash"
+        "${SHELL_CONFIGS_PATH}/.fzf.bash"
+    )
+    
+    for path in "${FZF_PATHS[@]}"; do
+        if [[ -f "${path}" ]]; then
+            echo "Found restored fzf configuration at ${path}"
+            cp "${path}" "${USER_HOME}/.fzf.bash"
+            # Also check for fzf.zsh
+            if [[ -f "${path%/*}/.fzf.zsh" ]]; then
+                cp "${path%/*}/.fzf.zsh" "${USER_HOME}/.fzf.zsh"
+            fi
+            RESTORED_TOOLS+=("fzf")
+            # Set proper ownership
+            if [[ -n "${SUDO_USER}" ]]; then
+                chown "${SUDO_USER}":"${SUDO_USER}" "${USER_HOME}/.fzf.bash"
+                [[ -f "${USER_HOME}/.fzf.zsh" ]] && chown "${SUDO_USER}":"${SUDO_USER}" "${USER_HOME}/.fzf.zsh"
+            fi
+            break
+        fi
+    done
+fi
+
+# Create symlinks for bat (sometimes installed as batcat)
+if [[ -f /usr/bin/batcat ]] && [[ ! -f /usr/local/bin/bat ]]; then
+    ln -s /usr/bin/batcat /usr/local/bin/bat
+    echo "✓ Created bat symlink"
+fi
+
+# Create symlinks for fd (sometimes installed as fdfind)
+if [[ -f /usr/bin/fdfind ]] && [[ ! -f /usr/local/bin/fd ]]; then
+    ln -s /usr/bin/fdfind /usr/local/bin/fd
+    echo "✓ Created fd symlink"
+fi
+
+# === STAGE 7: Check for New Configuration Files ===
 section "Checking for New Configuration Files"
 
 # Check for any new configuration files created during installation
 check_post_installation_configs "tmux" "${TMUX_CONFIG_FILES[@]}"
-check_post_installation_configs "ranger" "${RANGER_CONFIG_FILES[@]}"
-check_post_installation_configs "nnn" "${NNN_CONFIG_FILES[@]}"
-check_post_installation_configs "btop" "${BTOP_CONFIG_FILES[@]}"
+if [[ "${RESTORED_RANGER}" = false ]]; then
+    check_post_installation_configs "ranger" "${RANGER_CONFIG_FILES[@]}"
+fi
+if [[ "${RESTORED_NNN}" = false ]]; then
+    check_post_installation_configs "nnn" "${NNN_CONFIG_FILES[@]}"
+fi
+if [[ "${RESTORED_BTOP}" = false ]]; then
+    check_post_installation_configs "btop" "${BTOP_CONFIG_FILES[@]}"
+fi
 
 # Final update
 apt-get update
@@ -200,10 +446,27 @@ echo "  - Network monitoring (mtr, nmap, iftop, nload, bmon)"
 echo "  - Disk usage analyzers (ncdu, duf)"
 echo "  - Process automation (entr, parallel)"
 echo "  - Tmux configuration with customizations"
-echo
-echo "All configurations are managed through the repository at: /repo/personal/core-configs/"
-echo "  - If a configuration existed in the repo, it was symlinked to the correct location"
-echo "  - If a configuration was created during installation, it was moved to the repo and symlinked"
-echo "  - Any changes to configurations should be made in the repository"
+
+if [[ "${RESTORED_CONFIGS_AVAILABLE}" = true ]]; then
+    echo
+    echo "Restoration status:"
+    echo "  ✓ Configuration files restored from /restart/critical_backups"
+    if [[ -n "${RESTORED_TMUX_CONF}" ]]; then
+        echo "  ✓ Restored tmux configuration"
+    fi
+    if [[ "${RESTORED_RANGER}" = true ]]; then
+        echo "  ✓ Restored ranger configuration"
+    fi
+    if [[ "${RESTORED_NNN}" = true ]]; then
+        echo "  ✓ Restored nnn configuration"
+    fi
+    if [[ "${RESTORED_BTOP}" = true ]]; then
+        echo "  ✓ Restored btop configuration"
+    fi
+    for tool in "${RESTORED_TOOLS[@]}"; do
+        echo "  ✓ Restored ${tool} configuration"
+    done
+fi
+
 echo
 echo "These tools will help you efficiently manage your system from the terminal."

@@ -12,14 +12,24 @@ set -e
 source /usr/local/lib/kde-installer/functions.sh
 
 # Determine user home directory
-if [[ "${SUDO_USER}" ]]; then
-    USER_HOME=$(getent passwd "${SUDO_USER}" | cut -d: -f6)
+if [[ -n "${SUDO_USER}" ]]; then
+    set +e
+    USER_HOME=$(getent passwd "${SUDO_USER}" | cut -d: -f6) || true
+    set -e
+    USER_HOME=${USER_HOME:-"${HOME}"}
     # shellcheck disable=SC2034
     ACTUAL_USER="${SUDO_USER}"
 else
     USER_HOME="${HOME}"
     # shellcheck disable=SC2034
     ACTUAL_USER="${USER}"
+fi
+
+# Check if we have restored configurations
+if [[ -n "${CONFIG_MAPPING_PATH}" ]] && [[ -f "${CONFIG_MAPPING_PATH}" ]]; then
+    echo "Found restored configuration mapping at: ${CONFIG_MAPPING_PATH}"
+    # shellcheck disable=SC1090
+    source "${CONFIG_MAPPING_PATH}"
 fi
 
 # Define configuration files for user profile
@@ -53,12 +63,17 @@ apt-get update
 # === STAGE 1: Pre-Installation Configuration ===
 section "Setting Up Pre-Installation Configurations"
 
-# Set up pre-installation configurations for user profile
-handle_pre_installation_config "bash" "${BASH_CONFIG_FILES[@]}"
-handle_pre_installation_config "git" "${GIT_CONFIG_FILES[@]}"
-handle_pre_installation_config "vim" "${VIM_CONFIG_FILES[@]}"
-handle_pre_installation_config "tmux" "${TMUX_CONFIG_FILES[@]}"
-handle_pre_installation_config "ssh" "${SSH_CONFIG_FILES[@]}"
+# Check for restored configurations first and skip pre-installation if found
+if [[ -n "${GENERAL_CONFIGS_PATH}" ]] || [[ -n "${SHELL_CONFIGS_PATH}" ]]; then
+    echo "Using restored configurations from backup. Skipping pre-installation setup."
+else
+    # Set up pre-installation configurations for user profile
+    handle_pre_installation_config "bash" "${BASH_CONFIG_FILES[@]}"
+    handle_pre_installation_config "git" "${GIT_CONFIG_FILES[@]}"
+    handle_pre_installation_config "vim" "${VIM_CONFIG_FILES[@]}"
+    handle_pre_installation_config "tmux" "${TMUX_CONFIG_FILES[@]}"
+    handle_pre_installation_config "ssh" "${SSH_CONFIG_FILES[@]}"
+fi
 
 # Upgrade existing packages
 section "Upgrading Existing Packages"
@@ -90,8 +105,10 @@ install_packages "Base System Utilities" \
     ca-certificates
 
 # GitHub CLI
-curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg || true
+# Get architecture separately to avoid masking return value
+ARCH=$(dpkg --print-architecture) || ARCH="amd64"
+echo "deb [arch=${ARCH} signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
 apt-get update
 install_packages "GitHub CLI" gh
 
@@ -125,12 +142,87 @@ mkdir -p "${USER_HOME}/.local/share"
 mkdir -p "${USER_HOME}/.ssh"
 chmod 700 "${USER_HOME}/.ssh"
 
-# Handle configuration files
-handle_installed_software_config "bash" "${BASH_CONFIG_FILES[@]}"
-handle_installed_software_config "git" "${GIT_CONFIG_FILES[@]}"
-handle_installed_software_config "vim" "${VIM_CONFIG_FILES[@]}"
-handle_installed_software_config "tmux" "${TMUX_CONFIG_FILES[@]}"
-handle_installed_software_config "ssh" "${SSH_CONFIG_FILES[@]}"
+# Check for restored configurations first
+if [[ -n "${SHELL_CONFIGS_PATH}" ]] && [[ -d "${SHELL_CONFIGS_PATH}" ]]; then
+    echo "Found restored shell configurations at: ${SHELL_CONFIGS_PATH}"
+    
+    # Copy restored shell configuration files
+    for config_file in .bashrc .bash_profile .bash_aliases .profile; do
+        if [[ -f "${SHELL_CONFIGS_PATH}/${config_file}" ]]; then
+            # Back up existing file if it exists
+            if [[ -f "${USER_HOME}/${config_file}" ]] && [[ ! -L "${USER_HOME}/${config_file}" ]]; then
+                TIMESTAMP=$(date +%Y%m%d-%H%M%S) || TIMESTAMP="backup"
+                mv "${USER_HOME}/${config_file}" "${USER_HOME}/${config_file}.orig.${TIMESTAMP}"
+                echo "Backed up existing ${config_file}"
+            fi
+            
+            # Copy restored file if not already handled by 00-initial-setup.sh
+            if [[ ! -f "${USER_HOME}/${config_file}" ]] || [[ ! -L "${USER_HOME}/${config_file}" ]]; then
+                cp "${SHELL_CONFIGS_PATH}/${config_file}" "${USER_HOME}/"
+                echo "✓ Restored ${config_file} from backup"
+            fi
+        fi
+    done
+    
+    # Check for Git config files
+    for git_config in .gitconfig .gitignore_global .git-credentials; do
+        if [[ -f "${SHELL_CONFIGS_PATH}/${git_config}" ]]; then
+            # Back up existing file if it exists
+            if [[ -f "${USER_HOME}/${git_config}" ]] && [[ ! -L "${USER_HOME}/${git_config}" ]]; then
+                TIMESTAMP=$(date +%Y%m%d-%H%M%S) || TIMESTAMP="backup"
+                mv "${USER_HOME}/${git_config}" "${USER_HOME}/${git_config}.orig.${TIMESTAMP}"
+                echo "Backed up existing ${git_config}"
+            fi
+            
+            # Copy restored file if not already handled by 00-initial-setup.sh
+            if [[ ! -f "${USER_HOME}/${git_config}" ]] || [[ ! -L "${USER_HOME}/${git_config}" ]]; then
+                cp "${SHELL_CONFIGS_PATH}/${git_config}" "${USER_HOME}/"
+                echo "✓ Restored ${git_config} from backup"
+            fi
+        fi
+    done
+    
+    # Check for Vim config
+    if [[ -f "${SHELL_CONFIGS_PATH}/.vimrc" ]]; then
+        # Back up existing file if it exists
+        if [[ -f "${USER_HOME}/.vimrc" ]] && [[ ! -L "${USER_HOME}/.vimrc" ]]; then
+            TIMESTAMP=$(date +%Y%m%d-%H%M%S) || TIMESTAMP="backup"
+            mv "${USER_HOME}/.vimrc" "${USER_HOME}/.vimrc.orig.${TIMESTAMP}"
+            echo "Backed up existing .vimrc"
+        fi
+        
+        # Copy restored file if not already handled by 00-initial-setup.sh
+        if [[ ! -f "${USER_HOME}/.vimrc" ]] || [[ ! -L "${USER_HOME}/.vimrc" ]]; then
+            cp "${SHELL_CONFIGS_PATH}/.vimrc" "${USER_HOME}/"
+            echo "✓ Restored .vimrc from backup"
+        fi
+    fi
+    
+    # Check for Tmux config
+    if [[ -f "${SHELL_CONFIGS_PATH}/.tmux.conf" ]]; then
+        # Back up existing file if it exists
+        if [[ -f "${USER_HOME}/.tmux.conf" ]] && [[ ! -L "${USER_HOME}/.tmux.conf" ]]; then
+            TIMESTAMP=$(date +%Y%m%d-%H%M%S) || TIMESTAMP="backup"
+            mv "${USER_HOME}/.tmux.conf" "${USER_HOME}/.tmux.conf.orig.${TIMESTAMP}"
+            echo "Backed up existing .tmux.conf"
+        fi
+        
+        # Copy restored file
+        cp "${SHELL_CONFIGS_PATH}/.tmux.conf" "${USER_HOME}/"
+        echo "✓ Restored .tmux.conf from backup"
+    fi
+    
+    echo "✓ Restored configurations from backup"
+else
+    # If no restored configs, handle configuration files from repo
+    handle_installed_software_config "bash" "${BASH_CONFIG_FILES[@]}"
+    handle_installed_software_config "git" "${GIT_CONFIG_FILES[@]}"
+    handle_installed_software_config "vim" "${VIM_CONFIG_FILES[@]}"
+    handle_installed_software_config "tmux" "${TMUX_CONFIG_FILES[@]}"
+    handle_installed_software_config "ssh" "${SSH_CONFIG_FILES[@]}"
+    
+    echo "✓ Set up configuration files from repository"
+fi
 
 # Set proper permissions for SSH config
 if [[ -f "${USER_HOME}/.ssh/config" ]]; then

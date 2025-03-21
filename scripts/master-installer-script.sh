@@ -50,7 +50,7 @@ check_sudo() {
 # Create flag directory if it doesn't exist
 create_flag_directory() {
     local user_home
-    user_home=$(getent passwd "${SUDO_USER}" | cut -d: -f6)
+    user_home=$(getent passwd "${SUDO_USER}" | cut -d: -f6) || true
     mkdir -p "${user_home}/.config/kde-installer"
     chown -R "${SUDO_USER}":"${SUDO_USER}" "${user_home}/.config/kde-installer"
 }
@@ -59,7 +59,7 @@ create_flag_directory() {
 mark_completed() {
     local script_name="${1}"
     local user_home
-    user_home=$(getent passwd "${SUDO_USER}" | cut -d: -f6)
+    user_home=$(getent passwd "${SUDO_USER}" | cut -d: -f6) || true
     touch "${user_home}/.config/kde-installer/${script_name}.completed"
     chown "${SUDO_USER}":"${SUDO_USER}" "${user_home}/.config/kde-installer/${script_name}.completed"
     echo -e "${GREEN}✓ Marked ${script_name} as completed${NC}"
@@ -69,7 +69,7 @@ mark_completed() {
 is_completed() {
     local script_name="${1}"
     local user_home
-    user_home=$(getent passwd "${SUDO_USER}" | cut -d: -f6)
+    user_home=$(getent passwd "${SUDO_USER}" | cut -d: -f6) || true
     if [[ -f "${user_home}/.config/kde-installer/${script_name}.completed" ]]; then
         return 0  # True, script is completed
     else
@@ -80,7 +80,9 @@ is_completed() {
 # Get script basename without extension
 get_script_basename() {
     local full_name="${1}"
-    basename "${full_name}" .sh
+    local result
+    result=$(basename "${full_name}" .sh) || true
+    echo "${result}"
 }
 
 # Source the configuration management functions
@@ -101,14 +103,62 @@ source_config_functions() {
     fi
 }
 
+# Function to restore critical backups before installation
+restore_critical_backups() {
+    local script_dir
+    script_dir=$(dirname "${0}")
+    local restore_script="${script_dir}/restore-critical-backups.sh"
+    
+    section "Restoring Critical Backups"
+    
+    if [[ -f "${restore_script}" ]]; then
+        echo -e "${GREEN}Restoring critical configuration backups...${NC}"
+        chmod +x "${restore_script}"
+        
+        if bash "${restore_script}"; then
+            echo -e "${GREEN}✓ Critical backups restored successfully${NC}"
+            
+            # Create CONFIG_MAPPING_PATH environment variable for use by install scripts
+            if [[ -f "/restart/critical_backups/config_mapping.txt" ]]; then
+                export CONFIG_MAPPING_PATH="/restart/critical_backups/config_mapping.txt"
+                echo -e "${GREEN}✓ Config mapping path set to: ${CONFIG_MAPPING_PATH}${NC}"
+            else
+                echo -e "${YELLOW}Warning: Config mapping file not found at /restart/critical_backups/config_mapping.txt${NC}"
+                echo -e "${YELLOW}Some installation scripts may not be able to find restored configurations.${NC}"
+            fi
+            
+            return 0
+        else
+            echo -e "${YELLOW}Warning: Restore script returned non-zero exit code${NC}"
+            echo -e "${YELLOW}Will continue with installation, but some configurations may not be available.${NC}"
+            return 1
+        fi
+    else
+        echo -e "${YELLOW}Restore script not found at: ${restore_script}${NC}"
+        echo -e "${YELLOW}Will continue with installation without restoring backups.${NC}"
+        return 1
+    fi
+}
+
 # Function to run script with confirmation
 run_script() {
     local script="${1}"
     local basename
+    
+    # Get the basename separately to preserve set -e behavior
+    set +e
     basename=$(get_script_basename "${script}")
+    set -e
     
     # Check if script has already been completed
-    if is_completed "${basename}"; then
+    # Run is_completed separately to preserve set -e behavior
+    local is_already_completed
+    set +e
+    is_completed "${basename}"
+    is_already_completed=$?
+    set -e
+    
+    if [[ ${is_already_completed} -eq 0 ]]; then
         echo -e "${GREEN}Script ${script} has already been completed. Skipping.${NC}"
         return 0
     fi
@@ -126,8 +176,19 @@ run_script() {
         export CONFIG_FUNCTIONS_PATH
         CONFIG_FUNCTIONS_PATH="$(dirname "${0}")/config-management-functions.sh"
         
+        # Export the CONFIG_MAPPING_PATH if it exists
+        if [[ -n "${CONFIG_MAPPING_PATH}" ]]; then
+            export CONFIG_MAPPING_PATH
+        fi
+        
         # Run the script
-        if bash "${script}"; then
+        local script_result
+        set +e
+        bash "${script}"
+        script_result=$?
+        set -e
+        
+        if [[ ${script_result} -eq 0 ]]; then
             echo
             echo -e "${GREEN}✓ Completed: ${script}${NC}"
             
@@ -154,8 +215,8 @@ find_scripts() {
     local script_dir
     script_dir=$(dirname "${0}")
     
-    # Find all scripts with numeric prefixes and sort them
-    find "${script_dir}" -maxdepth 1 -name "[0-9][0-9]-*.sh" | sort
+    # Find all scripts with numeric prefixes except LVM scripts and sort them
+    find "${script_dir}" -maxdepth 1 -name "[0-9][0-9]-*.sh" | grep -v "lvm" | sort || true
 }
 
 # Main function
@@ -165,8 +226,13 @@ main() {
     create_flag_directory
     source_config_functions
     
+    # Restore critical backups first
+    restore_critical_backups
+    
     # Get list of scripts
-    mapfile -t SCRIPTS < <(find_scripts)
+    local script_list
+    script_list=$(find_scripts) || true
+    mapfile -t SCRIPTS <<< "${script_list}"
     
     section "Installation Sequence"
     echo "The following scripts will be executed in sequence:"
@@ -174,8 +240,19 @@ main() {
     
     for script in "${SCRIPTS[@]}"; do
         local basename
+        # Get the basename separately to preserve set -e behavior
+        set +e
         basename=$(get_script_basename "${script}")
-        if is_completed "${basename}"; then
+        set -e
+        
+        # Run is_completed separately to preserve set -e behavior
+        local is_already_completed
+        set +e
+        is_completed "${basename}"
+        is_already_completed=$?
+        set -e
+        
+        if [[ ${is_already_completed} -eq 0 ]]; then
             echo -e "${GREEN}✓ ${script}${NC} (completed)"
         else
             echo -e "${YELLOW}• ${script}${NC} (pending)"
@@ -187,10 +264,14 @@ main() {
     
     # Execute scripts in sequence
     for script in "${SCRIPTS[@]}"; do
+        # Run the script separately to preserve set -e behavior
+        local run_result
+        set +e
         run_script "${script}"
+        run_result=$?
+        set -e
         
-        # Check if script execution failed
-        if ! run_script "${script}"; then
+        if [[ ${run_result} -ne 0 ]]; then
             echo -e "${RED}Installation sequence interrupted.${NC}"
             echo "Fix the issues and run this script again to continue."
             exit 1
@@ -198,7 +279,7 @@ main() {
         
         # Check if a reboot is needed based on script name
         local basename
-        basename=$(get_script_basename "${script}")
+        basename=$(get_script_basename "${script}") || true
         if [[ "${basename}" == *"kde-desktop"* ]] || [[ "${basename}" == *"nvidia"* ]]; then
             echo -e "${YELLOW}A reboot is recommended at this point.${NC}"
             echo "This ensures all components are properly initialized."
@@ -225,6 +306,7 @@ main() {
     echo "  • Development tools and environments"
     echo "  • Properly symlinked configurations from your config repository"
     echo "  • Audio system optimizations"
+    echo "  • Network and system performance tweaks"
     echo
     echo "You may want to reboot your system to ensure all changes take effect."
     echo
