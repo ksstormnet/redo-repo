@@ -86,7 +86,7 @@ for drive in $NVME_DRIVES; do
     DRIVE_LIST="$DRIVE_LIST $drive"
 done
 
-vgcreate vg_data "$DRIVE_LIST"
+vgcreate -ff vg_data "$DRIVE_LIST"
 echo "✓ Volume group 'vg_data' created"
 
 # Display volume group information

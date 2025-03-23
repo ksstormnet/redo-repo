@@ -49,13 +49,13 @@ section "Logical Volume Configuration"
 echo "The following logical volumes will be created:"
 echo
 echo "Mirror volumes for critical data:"
-echo "  - lv_home (200GB, RAID1): User profile and config files"
-echo "  - lv_data (2.3TB, RAID1): User documents, media, and project files"
+echo "  - lv_home (50GB, RAID1): User profile and config files"
+echo "  - lv_data (2TB, RAID1): User documents, media, and project files"
 echo
 echo "Striped volumes for performance:"
-echo "  - lv_docker (500GB, RAID0): Docker containers and images"
+echo "  - lv_docker (250GB, RAID0): Docker containers and images"
 echo "  - lv_virtualbox (150GB, RAID0): Virtual machine storage"
-echo "  - lv_models (800GB, RAID0): AI model storage for LLM inference"
+echo "  - lv_models (600GB, RAID0): AI model storage for LLM inference"
 echo
 echo "Standard volume:"
 echo "  - lv_var (50GB): System logs and temporary files"
@@ -63,7 +63,7 @@ echo
 
 # Check if volume group has enough space
 VG_SIZE_KB=$(vgdisplay vg_data | grep "VG Size" | awk '{print $3}' | sed 's/\..*//')
-TOTAL_LV_SIZE_KB=$((200 * 1024 * 1024 + 2300 * 1024 * 1024 + 500 * 1024 * 1024 + 150 * 1024 * 1024 + 800 * 1024 * 1024 + 50 * 1024 * 1024))
+TOTAL_LV_SIZE_KB=$((200 * 1024 * 1024 + 2000 * 1024 * 1024 + 250 * 1024 * 1024 + 150 * 1024 * 1024 + 600 * 1024 * 1024 + 50 * 1024 * 1024))
 
 if [ "$VG_SIZE_KB" -lt "$TOTAL_LV_SIZE_KB" ]; then
     echo "WARNING: The total size of logical volumes may exceed the available space."
@@ -90,20 +90,20 @@ section "Creating Logical Volumes"
 
 # Create mirrored volumes for critical data
 echo "Creating mirrored volumes for critical data..."
-echo "Creating lv_home (200GB, RAID1)..."
-lvcreate --type raid1 -m1 -L 200G -n lv_home vg_data
-echo "Creating lv_data (2.3TB, RAID1)..."
-lvcreate --type raid1 -m1 -L 2.3T -n lv_data vg_data
+echo "Creating lv_home (50GB, RAID1)..."
+lvcreate --type raid1 -m1 -L 50G -n lv_home vg_data
+echo "Creating lv_data (2TB, RAID1)..."
+lvcreate --type raid1 -m1 -L 2T -n lv_data vg_data
 echo "✓ Mirrored volumes created"
 
 # Create striped volumes for performance
 echo "Creating striped volumes for performance..."
-echo "Creating lv_docker (500GB, RAID0)..."
-lvcreate --type raid0 -i 3 -L 500G -n lv_docker vg_data
+echo "Creating lv_docker (250GB, RAID0)..."
+lvcreate --type raid0 -i 3 -L 250G -n lv_docker vg_data
 echo "Creating lv_virtualbox (150GB, RAID0)..."
 lvcreate --type raid0 -i 3 -L 150G -n lv_virtualbox vg_data
-echo "Creating lv_models (800GB, RAID0)..."
-lvcreate --type raid0 -i 3 -L 800G -n lv_models vg_data
+echo "Creating lv_models (600GB, RAID0)..."
+lvcreate --type raid0 -i 3 -L 600G -n lv_models vg_data
 echo "✓ Striped volumes created"
 
 # Create standard volume
