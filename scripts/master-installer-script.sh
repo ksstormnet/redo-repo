@@ -91,7 +91,7 @@ source_config_functions() {
     local script_dir
     script_dir=$(dirname "${0}")
     local config_functions_script="${script_dir}/config-management-functions.sh"
-    
+
     if [[ -f "${config_functions_script}" ]]; then
         echo -e "${GREEN}Sourcing configuration management functions...${NC}"
         source "${config_functions_script}"
@@ -105,6 +105,7 @@ source_config_functions() {
 
 # Function to restore critical backups before installation
 restore_critical_backups() {
+return # commented out for now, the backups don't need restored every time this runs
     local script_dir
     script_dir=$(dirname "${0}")
     local restore_script="${script_dir}/restore-critical-backups.sh"
