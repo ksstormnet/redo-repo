@@ -242,24 +242,7 @@ if ! handle_installed_software_config "nvidia" "/etc/profile.d/nvidia-env.sh"; t
 # CUDA optimization settings for LLM inference
 
 # Add CUDA to PATH and LD_LIBRARY_PATH
-export PATH=\$PATH:/usr/local/cuda/bin
-export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:/usr/local/cuda/lib64
-
-# Optimize memory allocation for LLMs
-export CUDA_MALLOC_CONFIG=arena
-export CUDA_VISIBLE_DEVICES=0
-
-# Optimize JIT compilation
-export CUDA_CACHE_DISABLE=0
-export CUDA_CACHE_MAXSIZE=2147483648  # 2GB cache
-export CUDA_CACHE_PATH=/var/cache/cuda
-EOF
-    
-    echo "✓ Created CUDA optimization settings"
-    
-    # Now move it to the repo and create a symlink
-    handle_installed_software_config "nvidia" "/etc/profile.d/nvidia-env.sh"
-fi
+export PATH=\$PATH:/usr/local/c)
 
 # Create CUDA cache directory
 mkdir -p /var/cache/cuda
@@ -302,7 +285,35 @@ if [[ -n "${GENERAL_CONFIGS_PATH}" ]]; then
         # Create Ollama directory if it doesn't exist
         mkdir -p "${USER_HOME}/.ollama/modelfiles"
         
-        # Copy modelfile template
+mkdir -p "${USER_HOME}/.ollama/modelfiles"
+    
+    # Create the modelfile with RTX 3090 optimizations
+    cat > "${USER_HOME}/.ollama/modelfiles/rtx3090-modelfile.txt" << EOF
+# RTX 3090 Optimized Modelfile Template
+# Use this as a base for your Ollama models
+
+FROM {{MODEL_NAME}}
+
+# RTX 3090 CUDA optimizations
+PARAMETER num_ctx 8192
+PARAMETER num_gpu 1
+PARAMETER num_thread 8
+PARAMETER num_batch 128
+PARAMETER use_flash_attn 1
+PARAMETER gpu_layers 43
+
+# Memory optimizations for RTX 3090 (24GB VRAM)
+PARAMETER f16 true
+PARAMETER tensor_split 1
+EOF
+    
+    # Set proper ownership
+    set_user_ownership "${USER_HOME}/.ollama"
+    
+    echo "✓ Created RTX 3090 modelfile template"
+fi
+
+       # Copy modelfile template
         cp "${RTX_MODELFILE}" "${USER_HOME}/.ollama/modelfiles/"
         
         # Set proper ownership
