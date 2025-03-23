@@ -5,6 +5,7 @@
 # and manages development environment configurations using the repository
 # Assumes PHP 8.4, Composer, and Node.js are already installed
 # Modified to use restored configurations from /restart/critical_backups
+# Modified to run composer commands as the invoking user rather than root
 
 # Exit on any error
 set -e
@@ -16,13 +17,20 @@ source /usr/local/lib/kde-installer/functions.sh
 # Determine user home directory
 if [[ -n "${SUDO_USER}" ]]; then
     USER_HOME=$(getent passwd "${SUDO_USER}" | cut -d: -f6) || true
-    # shellcheck disable=SC2034
     ACTUAL_USER="${SUDO_USER}"
 else
     USER_HOME="${HOME}"
-    # shellcheck disable=SC2034
     ACTUAL_USER="${USER}"
 fi
+
+# Function to run commands as the actual user instead of root
+run_as_user() {
+    if [[ -n "${SUDO_USER}" ]]; then
+        sudo -u "${SUDO_USER}" "$@"
+    else
+        "$@"
+    fi
+}
 
 # Check for restored configurations
 CONFIG_MAPPING="/restart/critical_backups/config_mapping.txt"
@@ -166,9 +174,7 @@ if [[ "${RESTORED_CONFIGS_AVAILABLE}" = true ]]; then
     for path in "${COMPOSER_LIST_PATHS[@]}"; do
         if [[ -f "${path}" ]]; then
             echo "Found restored composer global packages list at ${path}"
-            # shellcheck disable=SC2034
             RESTORED_COMPOSER_LIST="${path}"
-            # shellcheck disable=SC2034
             RESTORED_COMPOSER_PACKAGES=true
             break
         fi
@@ -265,11 +271,10 @@ else
     echo "✅ Global Node.js packages installed successfully."
     
     # Create a record of installed packages for future restoration
-    
-    sudo chown -R scott:scott /home/scott
-    npm list -g --depth=0 > "${USER_HOME}/npm-global-packages.txt"
+    sudo chown -R "${ACTUAL_USER}:${ACTUAL_USER}" "${USER_HOME}"
+    run_as_user npm list -g --depth=0 > "${USER_HOME}/npm-global-packages.txt"
     if [[ -d "/repo/personal/core-configs/node" ]]; then
-        cp "${USER_HOME}/npm-global-packages.txt" "/repo/personal/core-configs/node/"
+        run_as_user cp "${USER_HOME}/npm-global-packages.txt" "/repo/personal/core-configs/node/"
         echo "✓ Saved list of global npm packages to repository"
     fi
 fi
@@ -285,7 +290,7 @@ if [[ "${RESTORED_COMPOSER_PACKAGES}" = true ]] && [[ -f "${RESTORED_COMPOSER_LI
             continue
         fi
         echo "Installing package: ${package}"
-        composer global require "${package}"
+        run_as_user composer global require "${package}"
     done < "${RESTORED_COMPOSER_LIST}"
     
     echo "✅ Restored global Composer packages installed successfully."
@@ -294,27 +299,27 @@ else
     
     # Code quality and analysis tools
     echo "Installing code quality and analysis tools..."
-    composer global require squizlabs/php_codesniffer       # PHP_CodeSniffer for coding standards
-    composer global require phpmd/phpmd                     # PHP Mess Detector
-    composer global require phpstan/phpstan                 # PHP Static Analysis Tool
-    composer global require friendsofphp/php-cs-fixer       # PHP Coding Standards Fixer
-    composer global require phan/phan                       # PHP Analyzer
+    run_as_user composer global require squizlabs/php_codesniffer       # PHP_CodeSniffer for coding standards
+    run_as_user composer global require phpmd/phpmd                     # PHP Mess Detector
+    run_as_user composer global require phpstan/phpstan                 # PHP Static Analysis Tool
+    run_as_user composer global require friendsofphp/php-cs-fixer       # PHP Coding Standards Fixer
+    run_as_user composer global require phan/phan                       # PHP Analyzer
     
     # Testing tools
     echo "Installing testing tools..."
-    composer global require phpunit/phpunit                 # PHP Unit Testing
+    run_as_user composer global require phpunit/phpunit                 # PHP Unit Testing
     
     # Utility tools
     echo "Installing utility tools..."
-    composer global require symfony/var-dumper              # Better var_dump
+    run_as_user composer global require symfony/var-dumper              # Better var_dump
     
     echo "✅ Global Composer packages installed successfully."
     
     # Create a record of installed packages for future restoration
-    composer global show > "${USER_HOME}/composer-global-packages.txt"
+    run_as_user composer global show > "${USER_HOME}/composer-global-packages.txt"
     if [[ -d "/repo/personal/core-configs/composer" ]]; then
-        sudo cp "${USER_HOME}/composer-global-packages.txt" "/repo/personal/core-configs/composer/"
-	sudo chown -R scott:scott /repo/*
+        run_as_user cp "${USER_HOME}/composer-global-packages.txt" "/repo/personal/core-configs/composer/"
+        sudo chown -R "${ACTUAL_USER}:${ACTUAL_USER}" /repo/*
         echo "✓ Saved list of global Composer packages to repository"
     fi
 fi
