@@ -879,43 +879,6 @@ else
     echo "✓ Set up default Git configuration"
 fi
 
-# === STAGE 12: Set Up Vim Configuration from Backup ===
-section "Setting Up Vim Configuration"
-
-# Check if we have restored vim configuration
-check_restored_configs
-
-# First try to restore vim configuration from backup
-if [[ -n "${SHELL_CONFIGS_PATH}" ]] && [[ -f "${SHELL_CONFIGS_PATH}/.vimrc" ]]; then
-    # Back up existing file if it exists
-    if [[ -f "${USER_HOME}/.vimrc" ]]; then
-        timestamp=$(date +%Y%m%d-%H%M%S) || timestamp="backup"
-        mv "${USER_HOME}/.vimrc" "${USER_HOME}/.vimrc.orig.${timestamp}"
-        echo "Backed up existing .vimrc"
-    fi
-    
-    # Copy restored file
-    cp "${SHELL_CONFIGS_PATH}/.vimrc" "${USER_HOME}/"
-    set_user_ownership "${USER_HOME}/.vimrc"
-    echo "✓ Restored Vim configuration from backup"
-else
-    echo "No restored Vim configuration found."
-    
-    # Define configuration files for Vim
-    VIM_CONFIG_FILES=(
-        "${USER_HOME}/.vimrc"
-    )
-    
-    # Handle Vim configuration files using repo
-    if [[ -d "/repo/personal/core-configs" ]]; then
-        handle_installed_software_config "vim" "${VIM_CONFIG_FILES[@]}"
-    else
-        echo "No core-configs repository found. Using default Vim configuration."
-    fi
-    
-    echo "✓ Set up default Vim configuration"
-fi
-
 # === STAGE 13: Set Up System-wide SSH Configuration ===
 section "Setting up System-wide SSH Configuration"
 
@@ -926,20 +889,20 @@ SYSTEM_SSH_CONFIG_FILES=(
 )
 
 # Check if system-wide SSH configs exist in the repository
-if [[ -d "/repo/personal/core-configs/system/ssh" ]]; then
+#if [[ -d "/repo/personal/core-configs/system/ssh" ]]; then
     # Set up pre-installation configurations for system-wide SSH
-    handle_pre_installation_config "system/ssh" "${SYSTEM_SSH_CONFIG_FILES[@]}"
+#    handle_pre_installation_config "system/ssh" "${SYSTEM_SSH_CONFIG_FILES[@]}"
     
     # Handle system-wide SSH configuration files
-    handle_installed_software_config "system/ssh" "${SYSTEM_SSH_CONFIG_FILES[@]}"
+#    handle_installed_software_config "system/ssh" "${SYSTEM_SSH_CONFIG_FILES[@]}"
     
     # Restart SSH service to apply changes
-    systemctl restart ssh
+#    systemctl restart ssh
     
     echo "✓ Created symlinks for system-wide SSH configuration"
-else
+# else
     echo "No system-wide SSH configuration found in the repository."
-fi
+# fi
 
 # === STAGE 14: Check for New Configuration Files ===
 section "Checking for New Configuration Files"
@@ -961,10 +924,8 @@ VIM_CONFIG_FILES=(
 )
 
 # Check for any new configuration files created during installation
-check_post_installation_configs "bash" "${BASH_CONFIG_FILES[@]}"
-check_post_installation_configs "git" "${GIT_CONFIG_FILES[@]}"
-check_post_installation_configs "vim" "${VIM_CONFIG_FILES[@]}"
-check_post_installation_configs "system/ssh" "${SYSTEM_SSH_CONFIG_FILES[@]}"
+#check_post_installation_configs "bash" "${BASH_CONFIG_FILES[@]}"
+#check_post_installation_configs "git" "${GIT_CONFIG_FILES[@]}"
 
 section "Initial Setup Complete!"
 echo "The system is now prepared for the KDE installation process."

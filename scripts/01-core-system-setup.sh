@@ -116,14 +116,12 @@ install_packages "GitHub CLI" gh
 install_packages "LVM Tools" \
     lvm2 \
     thin-provisioning-tools \
-    system-config-lvm
 
 # System performance and management
 install_packages "System Performance & Management" \
     linux-lowlatency \
     linux-tools-common \
     lm-sensors \
-    hddtemp \
     tlp \
     powertop \
     smartmontools \
