@@ -154,6 +154,7 @@ EOF
 
 echo "✓ Created CUDA optimization settings"
 
+export PATH=\$PATH:/usr/local/c)
 
 # Create CUDA cache directory
 mkdir -p /var/cache/cuda
@@ -168,12 +169,80 @@ echo "✓ Applied performance optimizations for LLM inference"
 mkdir -p "${USER_HOME}/.ollama/modelfiles"
 
 # Copy modelfile template
-cp "${RTX_MODELFILE}" "${USER_HOME}/.ollama/modelfiles/"
+# cp "${RTX_MODELFILE}" "${USER_HOME}/.ollama/modelfiles/"
 
 # Set proper ownership
 set_user_ownership "${USER_HOME}/.ollama"
 
 echo "✓ Restored RTX 3090 modelfile template"
+=======
+# Check for restored LLM optimizations scripts
+if [[ -n "${GENERAL_CONFIGS_PATH}" ]]; then
+    LLM_SCRIPTS_PATH="${GENERAL_CONFIGS_PATH}/bin"
+    
+    # Check for Ollama optimizer script
+    if [[ -f "${LLM_SCRIPTS_PATH}/ollama-optimizer.sh" ]]; then
+        echo "Found Ollama optimizer script in backup"
+        
+        # Create bin directory if it doesn't exist
+        mkdir -p "${USER_HOME}/bin"
+        
+        # Copy script to bin directory
+        cp "${LLM_SCRIPTS_PATH}/ollama-optimizer.sh" "${USER_HOME}/bin/"
+        chmod +x "${USER_HOME}/bin/ollama-optimizer.sh"
+        
+        # Set proper ownership
+        set_user_ownership "${USER_HOME}/bin/ollama-optimizer.sh"
+        
+        echo "✓ Restored Ollama optimizer script"
+    fi
+    
+    # Check for RTX 3090 modelfile template
+    RTX_MODELFILE="${GENERAL_CONFIGS_PATH}/ollama/rtx3090-modelfile.txt"
+    if [[ -f "${RTX_MODELFILE}" ]]; then
+        echo "Found RTX 3090 modelfile template in backup"
+        
+        # Create Ollama directory if it doesn't exist
+        mkdir -p "${USER_HOME}/.ollama/modelfiles"
+        
+mkdir -p "${USER_HOME}/.ollama/modelfiles"
+    
+    # Create the modelfile with RTX 3090 optimizations
+    cat > "${USER_HOME}/.ollama/modelfiles/rtx3090-modelfile.txt" << EOF
+# RTX 3090 Optimized Modelfile Template
+# Use this as a base for your Ollama models
+
+FROM {{MODEL_NAME}}
+
+# RTX 3090 CUDA optimizations
+PARAMETER num_ctx 8192
+PARAMETER num_gpu 1
+PARAMETER num_thread 8
+PARAMETER num_batch 128
+PARAMETER use_flash_attn 1
+PARAMETER gpu_layers 43
+
+# Memory optimizations for RTX 3090 (24GB VRAM)
+PARAMETER f16 true
+PARAMETER tensor_split 1
+EOF
+    
+    # Set proper ownership
+    set_user_ownership "${USER_HOME}/.ollama"
+    
+    echo "✓ Created RTX 3090 modelfile template"
+fi
+
+       # Copy modelfile template
+        cp "${RTX_MODELFILE}" "${USER_HOME}/.ollama/modelfiles/"
+        
+        # Set proper ownership
+        set_user_ownership "${USER_HOME}/.ollama"
+        
+        echo "✓ Restored RTX 3090 modelfile template"
+    fi
+fi
+>>>>>>> 870c0312fa26cdc411d21469eca956a0e824e7f6
 
 # === STAGE 8: Manage NVIDIA Configurations ===
 section "Managing NVIDIA Configurations"
