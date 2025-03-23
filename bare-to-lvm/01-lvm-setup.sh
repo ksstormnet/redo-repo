@@ -80,13 +80,9 @@ echo "✓ All physical volumes created"
 section "Creating Volume Group"
 echo "Creating volume group 'vg_data' combining all NVMe drives..."
 
-# Get drive list for vgcreate command
-DRIVE_LIST=""
-for drive in $NVME_DRIVES; do
-    DRIVE_LIST="$DRIVE_LIST $drive"
-done
+sleep 5
 
-vgcreate -ff vg_data "$DRIVE_LIST"
+vgcreate vg_data /dev/nvme0n1 /dev/nvme1n1 /dev/nvme2n1 /dev/nvme3n1 /dev/nvme4n1 /dev/nvme5n1 /dev/nvme6n1 -ff
 echo "✓ Volume group 'vg_data' created"
 
 # Display volume group information

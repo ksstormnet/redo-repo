@@ -92,7 +92,7 @@ fi
 # Clear superblocks and any RAID signatures
 section "Clearing Drive Signatures"
 echo "Clearing superblocks and RAID signatures on NVMe drives..."
-for drive in $NVME_DRIVES; do
+for drive in "${NVME_DRIVES}"; do
     echo "Processing $drive..."
     
     # Clear RAID superblocks
@@ -106,7 +106,7 @@ done
 
 section "Verification"
 echo "Verifying drives are clear of signatures..."
-for drive in $NVME_DRIVES; do
+for drive in "${NVME_DRIVES}" ; do
     SIGNATURES=$(wipefs -n "$drive" | grep -cv "offset")
     if [ "$SIGNATURES" -gt 0 ]; then
         echo "WARNING: $drive still has some signatures. You may need to clear them manually."
