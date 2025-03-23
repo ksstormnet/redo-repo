@@ -139,6 +139,27 @@ mkfs.ext4 -L data /dev/vg_data/lv_data
 echo "Formatting lv_var..."
 mkfs.ext4 -L var /dev/vg_data/lv_var
 
+
+echo "Setting up /var structure..."
+mkdir -p /mnt/var_temp
+mount /dev/vg_data/lv_var /mnt/var_temp
+
+# Create the essential directory structure
+mkdir -p /mnt/var_temp/log/apt
+mkdir -p /mnt/var_temp/log/kde-installer
+mkdir -p /mnt/var_temp/cache/apt/archives
+mkdir -p /mnt/var_temp/lib/python3
+mkdir -p /mnt/var_temp/lib/apt
+mkdir -p /mnt/var_temp/crash
+mkdir -p /mnt/var_temp/spool
+mkdir -p /mnt/var_temp/tmp
+chmod 1777 /mnt/var_temp/tmp
+
+# Set proper permissions
+chmod 755 /mnt/var_temp/log/kde-installer
+
+# Unmount the temporary location
+umount /mnt/var_temp
 echo "✓ All logical volumes formatted"
 
 section "Logical Volumes Setup Complete"
