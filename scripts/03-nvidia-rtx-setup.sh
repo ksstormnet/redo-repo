@@ -98,7 +98,7 @@ options nvidia-drm modeset=1
 options nvidia NVreg_EnableGpuFirmware=1
 EOF
 
-    echo "✓ Created default NVIDIA configuration"
+echo "✓ Created default NVIDIA configuration"
 
 # Add NVIDIA modules to initramfs
 {
@@ -129,10 +129,8 @@ ExecStopPost=/bin/rm -rf /var/run/nvidia-persistenced
 [Install]
 WantedBy=multi-user.target
 EOF
-    
+
 echo "✓ Created NVIDIA persistence daemon service"
-    
-    # Now move it to the repo and create a symlink
 
 # Create a configuration file for CUDA-specific settings if it doesn't exist in the repo
 cat > /etc/profile.d/nvidia-env.sh << EOF
@@ -154,7 +152,7 @@ EOF
 
 echo "✓ Created CUDA optimization settings"
 
-export PATH=\$PATH:/usr/local/cuda/bin
+# export PATH=\$PATH:/usr/local/c)
 
 # Create CUDA cache directory
 /usr/bin/mkdir -p /var/cache/cuda
@@ -166,6 +164,9 @@ export PATH=\$PATH:/usr/local/cuda/bin
 echo "✓ Applied performance optimizations for LLM inference"
 
 # Create Ollama directory if it doesn't exist
+mkdir -p "${USER_HOME}/.ollama/modelfiles"
+
+# Create the modelfile with RTX 3090 optimizations
 mkdir -p "${USER_HOME}/.ollama/modelfiles"
 
 # Create the modelfile with RTX 3090 optimizations
@@ -187,19 +188,19 @@ PARAMETER gpu_layers 43
 PARAMETER f16 true
 PARAMETER tensor_split 1
 EOF
-    
-    # Set proper ownership
-    set_user_ownership "${USER_HOME}/.ollama"
-    
-    echo "✓ Created RTX 3090 modelfile template"
-fi
 
+    # Set proper ownership
+set_user_ownership "${USER_HOME}/.ollama"
+
+echo "✓ Created RTX 3090 modelfile template"
 
 # Set proper ownership
 set_user_ownership "${USER_HOME}/.ollama"
 
-
 /usr/bin/mkdir -p "${USER_HOME}/.ollama/modelfiles"
+
+# Create Ollama directory if it doesn't exist
+mkdir -p "${USER_HOME}/.ollama/modelfiles"
 
 # Create the modelfile with RTX 3090 optimizations
 cat > "${USER_HOME}/.ollama/modelfiles/rtx3090-modelfile.txt" << EOF
