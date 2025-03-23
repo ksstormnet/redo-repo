@@ -169,7 +169,34 @@ echo "✓ Applied performance optimizations for LLM inference"
 mkdir -p "${USER_HOME}/.ollama/modelfiles"
 
 # Copy modelfile template
-# cp "${RTX_MODELFILE}" "${USER_HOME}/.ollama/modelfiles/"
+mkdir -p "${USER_HOME}/.ollama/modelfiles"
+    
+    # Create the modelfile with RTX 3090 optimizations
+    cat > "${USER_HOME}/.ollama/modelfiles/rtx3090-modelfile.txt" << EOF
+# RTX 3090 Optimized Modelfile Template
+# Use this as a base for your Ollama models
+
+FROM {{MODEL_NAME}}
+
+# RTX 3090 CUDA optimizations
+PARAMETER num_ctx 8192
+PARAMETER num_gpu 1
+PARAMETER num_thread 8
+PARAMETER num_batch 128
+PARAMETER use_flash_attn 1
+PARAMETER gpu_layers 43
+
+# Memory optimizations for RTX 3090 (24GB VRAM)
+PARAMETER f16 true
+PARAMETER tensor_split 1
+EOF
+    
+    # Set proper ownership
+    set_user_ownership "${USER_HOME}/.ollama"
+    
+    echo "✓ Created RTX 3090 modelfile template"
+fi
+
 
 # Set proper ownership
 set_user_ownership "${USER_HOME}/.ollama"
