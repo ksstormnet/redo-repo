@@ -74,6 +74,21 @@ mkdir -p /opt/models
 
 echo "✓ Mount points created"
 
+echo "Mounting new /var volume temporarily..."
+mkdir -p /var_new
+mount /dev/vg_data/lv_var /var_new
+
+echo "Copying existing /var content to new volume..."
+# Use rsync to preserve permissions and links
+rsync -avxHAX /var/ /var_new/
+
+echo "Unmounting temporary mount point..."
+umount /var_new
+rmdir /var_new
+
+echo "✓ /var data migrated successfully"
+
+
 # Configure fstab
 section "Configuring fstab"
 echo "Backing up existing fstab..."
