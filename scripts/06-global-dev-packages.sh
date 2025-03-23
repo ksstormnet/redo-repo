@@ -229,51 +229,44 @@ else
     
     # Development workflow tools
     echo "Installing development workflow tools..."
-    npm install -g nodemon         # Monitor for changes and restart applications
-    npm install -g pm2             # Process manager for Node.js
-    npm install -g http-server     # Simple HTTP server
-    npm install -g serve           # Static file server
-    npm install -g concurrently    # Run multiple commands concurrently
-    npm install -g json-server     # Fake REST API server
+    sudo npm install -g nodemon         # Monitor for changes and restart applications
+    sudo npm install -g http-server     # Simple HTTP server
+    sudo npm install -g serve           # Static file server
+    sudo npm install -g concurrently    # Run multiple commands concurrently
+    sudo npm install -g json-server     # Fake REST API server
     
     # Code quality and formatting tools
     echo "Installing code quality and formatting tools..."
-    npm install -g eslint          # JavaScript linter
-    npm install -g prettier        # Code formatter
-    npm install -g typescript      # TypeScript compiler
-    npm install -g ts-node         # TypeScript execution environment
+    sudo npm install -g eslint          # JavaScript linter
+    sudo npm install -g prettier        # Code formatter
+    sudo npm install -g typescript      # TypeScript compiler
+    sudo npm install -g ts-node         # TypeScript execution environment
     
     # Build tools and task runners
     echo "Installing build tools and task runners..."
-    npm install -g gulp-cli        # Gulp command line interface
-    npm install -g grunt-cli       # Grunt command line interface
-    npm install -g webpack-cli     # Webpack command line interface
-    npm install -g vite            # Frontend build tool
+    sudo npm install -g gulp-cli        # Gulp command line interface
+    sudo npm install -g grunt-cli       # Grunt command line interface
+    sudo npm install -g webpack-cli     # Webpack command line interface
     
     # Utility and CLI tools
     echo "Installing utility and CLI tools..."
-    npm install -g npm-check-updates # Check for package updates
-    npm install -g tldr            # Simplified man pages
-    npm install -g trash-cli       # Safer alternative to rm
-    npm install -g release-it      # Automate versioning and package publishing
-    npm install -g dotenv-cli      # Environment variable management
+    sudo npm install -g npm-check-updates # Check for package updates
+    sudo npm install -g tldr            # Simplified man pages
+    sudo npm install -g trash-cli       # Safer alternative to rm
+    sudo npm install -g release-it      # Automate versioning and package publishing
+    sudo npm install -g dotenv-cli      # Environment variable management
     
     # Package management tools
     echo "Installing package management tools..."
-    npm install -g npm-check       # Check for outdated, incorrect, and unused dependencies
-    npm install -g depcheck        # Check for unused dependencies
-    npm install -g license-checker # Check licenses of dependencies
-    
-    # Framework-specific CLI tools
-    echo "Installing framework-specific CLI tools..."
-    npm install -g @angular/cli    # Angular CLI
-    npm install -g create-react-app # React application generator
-    npm install -g @vue/cli        # Vue.js CLI
-    npm install -g next            # Next.js
+    sudo npm install -g npm-check       # Check for outdated, incorrect, and unused dependencies
+    sudo npm install -g depcheck        # Check for unused dependencies
+    sudo npm install -g license-checker # Check licenses of dependencies
     
     echo "✅ Global Node.js packages installed successfully."
     
     # Create a record of installed packages for future restoration
+    
+    sudo chown -R scott:scott /home/scott
     npm list -g --depth=0 > "${USER_HOME}/npm-global-packages.txt"
     if [[ -d "/repo/personal/core-configs/node" ]]; then
         cp "${USER_HOME}/npm-global-packages.txt" "/repo/personal/core-configs/node/"
@@ -310,29 +303,18 @@ else
     # Testing tools
     echo "Installing testing tools..."
     composer global require phpunit/phpunit                 # PHP Unit Testing
-    composer global require infection/infection             # Mutation Testing
-    
-    # Security tools
-    echo "Installing security tools..."
-    composer global require sensiolabs/security-checker     # Security vulnerability checker
     
     # Utility tools
     echo "Installing utility tools..."
-    composer global require laravel/installer               # Laravel installer
-    composer global require symfony/symfony-installer       # Symfony installer
     composer global require symfony/var-dumper              # Better var_dump
-    composer global require ramsey/composer-install         # Composer install helper
-    
-    # Documentation tools
-    echo "Installing documentation tools..."
-    composer global require phpdocumentor/phpdocumentor     # PHP Documentor
     
     echo "✅ Global Composer packages installed successfully."
     
     # Create a record of installed packages for future restoration
     composer global show > "${USER_HOME}/composer-global-packages.txt"
     if [[ -d "/repo/personal/core-configs/composer" ]]; then
-        cp "${USER_HOME}/composer-global-packages.txt" "/repo/personal/core-configs/composer/"
+        sudo cp "${USER_HOME}/composer-global-packages.txt" "/repo/personal/core-configs/composer/"
+	sudo chown -R scott:scott /repo/*
         echo "✓ Saved list of global Composer packages to repository"
     fi
 fi
