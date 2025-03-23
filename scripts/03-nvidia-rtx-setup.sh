@@ -154,7 +154,7 @@ EOF
 
 echo "✓ Created CUDA optimization settings"
 
-export PATH=\$PATH:/usr/local/c)
+# export PATH=\$PATH:/usr/local/c)
 
 # Create CUDA cache directory
 mkdir -p /var/cache/cuda
@@ -172,7 +172,7 @@ mkdir -p "${USER_HOME}/.ollama/modelfiles"
 mkdir -p "${USER_HOME}/.ollama/modelfiles"
     
     # Create the modelfile with RTX 3090 optimizations
-    cat > "${USER_HOME}/.ollama/modelfiles/rtx3090-modelfile.txt" << EOF
+cat > "${USER_HOME}/.ollama/modelfiles/rtx3090-modelfile.txt" << EOF
 # RTX 3090 Optimized Modelfile Template
 # Use this as a base for your Ollama models
 
@@ -192,17 +192,15 @@ PARAMETER tensor_split 1
 EOF
     
     # Set proper ownership
-    set_user_ownership "${USER_HOME}/.ollama"
+set_user_ownership "${USER_HOME}/.ollama"
     
-    echo "✓ Created RTX 3090 modelfile template"
-fi
-
+echo "✓ Created RTX 3090 modelfile template"
 
 # Set proper ownership
 set_user_ownership "${USER_HOME}/.ollama"
 
 echo "✓ Restored RTX 3090 modelfile template"
-=======
+
 # Check for restored LLM optimizations scripts
 if [[ -n "${GENERAL_CONFIGS_PATH}" ]]; then
     LLM_SCRIPTS_PATH="${GENERAL_CONFIGS_PATH}/bin"
