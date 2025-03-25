@@ -1,0 +1,1164 @@
+[2025-03-24 04:05:37] INFO: Starting configuration backup process
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.ssh/config
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /etc/zsh/zshrc
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.zshrc
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /etc/bash.bashrc
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.bashrc
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /etc/gitconfig
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.gitconfig
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/Code
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/micro
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/kate
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/kdeconnect
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/kwinrc
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/konsolerc
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/okularrc
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/google-chrome
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/microsoft-edge
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/BraveSoftware
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/nano
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/ghostwriter
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/fontconfig
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/gtk-3.0
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/gtk-4.0
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/Mailspring
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/op
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/pinta
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/jack
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/pipewire
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.config/ibus
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.local/share/audacity
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.local/share/applications/appimagekit-clickup.desktop
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.local/share/applications/appimagekit-kdenlive.desktop
+[2025-03-24 04:05:37] WARNING: Source path does not exist: /home/scott/.local/share/applications/appimagekit-standard-notes.desktop
+[2025-03-24 04:05:38] WARNING: Source path does not exist: /home/scott/.local/share/applications/appimagekit-parsehub.desktop
+[2025-03-24 04:05:38] WARNING: Source path does not exist: /home/scott/.local/share/applications/appimagekit-rclone-browser.desktop
+[2025-03-24 04:05:38] WARNING: Source path does not exist: /home/scott/.local/share/applications/appimagekit-openshot.desktop
+[2025-03-24 04:05:38] WARNING: Source path does not exist: /home/scott/.local/share/applications/appimagekit-joplin.desktop
+[2025-03-24 04:05:38] WARNING: Source path does not exist: /home/scott/.local/share/applications/appimagekit-markdown-viewer.desktop
+[2025-03-24 04:05:38] WARNING: Source path does not exist: /home/scott/.local/zed.app
+[2025-03-24 04:05:38] WARNING: Source path does not exist: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:05:38] WARNING: Source path does not exist: /home/scott/.local/state/wireplumber
+[2025-03-24 04:05:38] WARNING: Source path does not exist: /home/scott/.local/share/applications/appimagelauncher.desktop
+[2025-03-24 04:05:38] WARNING: Source path does not exist: /home/scott/.local/share/flatpak
+[2025-03-24 04:05:38] ERROR: No configuration files found in programs_config.csv
+[2025-03-24 04:08:13] INFO: Starting configuration backup process
+[2025-03-24 04:08:13] ERROR: None of the specified configuration files exist on this system
+[2025-03-24 04:09:24] DEBUG: HOME directory is set to: /home/scott
+[2025-03-24 04:09:24] DEBUG: Current user: scott
+[2025-03-24 04:09:24] INFO: Starting configuration backup process
+[2025-03-24 04:09:24] DEBUG: Expanded path: Config File Path from original: Config File Path
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: Config File Path from original: Config File Path
+Config File Path (for Program)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: Config File Path from original: Config File Path
+Config File Path
+[2025-03-24 04:09:24] DEBUG: Expanded path: /etc/ssh/ssh_config from original: /etc/ssh/ssh_config
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /etc/ssh/ssh_config from original: /etc/ssh/ssh_config
+/etc/ssh/ssh_config (for SSH)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /etc/ssh/ssh_config from original: /etc/ssh/ssh_config
+/etc/ssh/ssh_config
+[2025-03-24 04:09:24] DEBUG: Expanded path: /etc/zsh/zshrc from original: /etc/zsh/zshrc
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /etc/zsh/zshrc from original: /etc/zsh/zshrc
+/etc/zsh/zshrc (for ZSH)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /etc/zsh/zshrc from original: /etc/zsh/zshrc
+/etc/zsh/zshrc
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.zshrc from original: ~/.zshrc
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.zshrc from original: ~/.zshrc
+/home/scott/.zshrc (for ZSH (user))
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.zshrc from original: ~/.zshrc
+/home/scott/.zshrc
+[2025-03-24 04:09:24] DEBUG: Expanded path: /etc/bash.bashrc from original: /etc/bash.bashrc
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /etc/bash.bashrc from original: /etc/bash.bashrc
+/etc/bash.bashrc (for Bash)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /etc/bash.bashrc from original: /etc/bash.bashrc
+/etc/bash.bashrc
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.bashrc from original: ~/.bashrc
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.bashrc from original: ~/.bashrc
+/home/scott/.bashrc (for Bash (user))
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.bashrc from original: ~/.bashrc
+/home/scott/.bashrc
+[2025-03-24 04:09:24] DEBUG: Expanded path: /etc/gitconfig from original: /etc/gitconfig
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /etc/gitconfig from original: /etc/gitconfig
+/etc/gitconfig (for Git)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /etc/gitconfig from original: /etc/gitconfig
+/etc/gitconfig
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.gitconfig from original: ~/.gitconfig
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.gitconfig from original: ~/.gitconfig
+/home/scott/.gitconfig (for Git (user))
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.gitconfig from original: ~/.gitconfig
+/home/scott/.gitconfig
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/Code from original: ~/.config/Code
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/Code from original: ~/.config/Code
+/home/scott/.config/Code (for VS Code)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/Code from original: ~/.config/Code
+/home/scott/.config/Code
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/micro from original: ~/.config/micro
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/micro from original: ~/.config/micro
+/home/scott/.config/micro (for Micro)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/micro from original: ~/.config/micro
+/home/scott/.config/micro
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/kate from original: ~/.config/kate
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/kate from original: ~/.config/kate
+/home/scott/.config/kate (for Kate)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/kate from original: ~/.config/kate
+/home/scott/.config/kate
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/kdeconnect from original: ~/.config/kdeconnect
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/kdeconnect from original: ~/.config/kdeconnect
+/home/scott/.config/kdeconnect (for KDE Connect)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/kdeconnect from original: ~/.config/kdeconnect
+/home/scott/.config/kdeconnect
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/kwinrc from original: ~/.config/kwinrc
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/kwinrc from original: ~/.config/kwinrc
+/home/scott/.config/kwinrc (for KWin)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/kwinrc from original: ~/.config/kwinrc
+/home/scott/.config/kwinrc
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc from original: ~/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc from original: ~/.config/plasma-org.kde.plasma.desktop-appletsrc
+/home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc (for Plasma Desktop)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc from original: ~/.config/plasma-org.kde.plasma.desktop-appletsrc
+/home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/konsolerc from original: ~/.config/konsolerc
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/konsolerc from original: ~/.config/konsolerc
+/home/scott/.config/konsolerc (for Konsole)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/konsolerc from original: ~/.config/konsolerc
+/home/scott/.config/konsolerc
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/okularrc from original: ~/.config/okularrc
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/okularrc from original: ~/.config/okularrc
+/home/scott/.config/okularrc (for Okular)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/okularrc from original: ~/.config/okularrc
+/home/scott/.config/okularrc
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/google-chrome from original: ~/.config/google-chrome
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/google-chrome from original: ~/.config/google-chrome
+/home/scott/.config/google-chrome (for Google Chrome)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/google-chrome from original: ~/.config/google-chrome
+/home/scott/.config/google-chrome
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/microsoft-edge from original: ~/.config/microsoft-edge
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/microsoft-edge from original: ~/.config/microsoft-edge
+/home/scott/.config/microsoft-edge (for Microsoft Edge)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/microsoft-edge from original: ~/.config/microsoft-edge
+/home/scott/.config/microsoft-edge
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/BraveSoftware from original: ~/.config/BraveSoftware
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/BraveSoftware from original: ~/.config/BraveSoftware
+/home/scott/.config/BraveSoftware (for Brave Browser)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/BraveSoftware from original: ~/.config/BraveSoftware
+/home/scott/.config/BraveSoftware
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/nano from original: ~/.config/nano
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/nano from original: ~/.config/nano
+/home/scott/.config/nano (for Nano)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/nano from original: ~/.config/nano
+/home/scott/.config/nano
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/ghostwriter from original: ~/.config/ghostwriter
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/ghostwriter from original: ~/.config/ghostwriter
+/home/scott/.config/ghostwriter (for Ghostwriter)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/ghostwriter from original: ~/.config/ghostwriter
+/home/scott/.config/ghostwriter
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/fontconfig from original: ~/.config/fontconfig
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/fontconfig from original: ~/.config/fontconfig
+/home/scott/.config/fontconfig (for Fontconfig)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/fontconfig from original: ~/.config/fontconfig
+/home/scott/.config/fontconfig
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/gtk-3.0 from original: ~/.config/gtk-3.0
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/gtk-3.0 from original: ~/.config/gtk-3.0
+/home/scott/.config/gtk-3.0 (for GTK-3.0)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/gtk-3.0 from original: ~/.config/gtk-3.0
+/home/scott/.config/gtk-3.0
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/gtk-4.0 from original: ~/.config/gtk-4.0
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/gtk-4.0 from original: ~/.config/gtk-4.0
+/home/scott/.config/gtk-4.0 (for GTK-4.0)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/gtk-4.0 from original: ~/.config/gtk-4.0
+/home/scott/.config/gtk-4.0
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/Mailspring from original: ~/.config/Mailspring
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/Mailspring from original: ~/.config/Mailspring
+/home/scott/.config/Mailspring (for Mailspring)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/Mailspring from original: ~/.config/Mailspring
+/home/scott/.config/Mailspring
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/op from original: ~/.config/op
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/op from original: ~/.config/op
+/home/scott/.config/op (for 1Password)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/op from original: ~/.config/op
+/home/scott/.config/op
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/pinta from original: ~/.config/pinta
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/pinta from original: ~/.config/pinta
+/home/scott/.config/pinta (for Pinta)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/pinta from original: ~/.config/pinta
+/home/scott/.config/pinta
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/jack from original: ~/.config/jack
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/jack from original: ~/.config/jack
+/home/scott/.config/jack (for Jack)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/jack from original: ~/.config/jack
+/home/scott/.config/jack
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/pipewire from original: ~/.config/pipewire
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/pipewire from original: ~/.config/pipewire
+/home/scott/.config/pipewire (for Pipewire)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/pipewire from original: ~/.config/pipewire
+/home/scott/.config/pipewire
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/ibus from original: ~/.config/ibus
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/ibus from original: ~/.config/ibus
+/home/scott/.config/ibus (for IBus)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.config/ibus from original: ~/.config/ibus
+/home/scott/.config/ibus
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.local/share/audacity from original: ~/.local/share/audacity
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.local/share/audacity from original: ~/.local/share/audacity
+/home/scott/.local/share/audacity (for Audacity)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.local/share/audacity from original: ~/.local/share/audacity
+/home/scott/.local/share/audacity
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.local/zed.app from original: ~/.local/zed.app
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.local/zed.app from original: ~/.local/zed.app
+/home/scott/.local/zed.app (for Zed)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.local/zed.app from original: ~/.local/zed.app
+/home/scott/.local/zed.app
+[2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.local/state/warp-terminal from original: ~/.local/state/warp-terminal
+[2025-03-24 04:09:24] DEBUG: Checking if path exists: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.local/state/warp-terminal from original: ~/.local/state/warp-terminal
+/home/scott/.local/state/warp-terminal (for Warp Terminal)
+[2025-03-24 04:09:24] DEBUG: Path does not exist: [2025-03-24 04:09:24] DEBUG: Expanded path: /home/scott/.local/state/warp-terminal from original: ~/.local/state/warp-terminal
+/home/scott/.local/state/warp-terminal
+[2025-03-24 04:09:24] ERROR: None of the specified configuration files exist on this system
+[2025-03-24 04:11:36] INFO: Starting configuration backup process
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /etc/ssh/ssh_config
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /etc/zsh/zshrc
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.zshrc
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /etc/bash.bashrc
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.bashrc
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /etc/gitconfig
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.gitconfig
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/Code
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/micro
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/kate
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/kdeconnect
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/kwinrc
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/konsolerc
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/okularrc
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/google-chrome
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/microsoft-edge
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/BraveSoftware
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/nano
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/ghostwriter
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/fontconfig
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/gtk-3.0
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/gtk-4.0
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/Mailspring
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/op
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/pinta
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/jack
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/pipewire
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.config/ibus
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.local/share/audacity
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.local/zed.app
+[2025-03-24 04:11:36] WARNING: Source path does not exist: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:11:36] ERROR: No configuration files found in programs_config.csv
+[2025-03-24 04:12:57] INFO: Starting configuration backup process
+[2025-03-24 04:12:57] INFO: Found valid path: /etc/ssh/ssh_config
+[2025-03-24 04:12:57] INFO: Found valid path: /etc/zsh/zshrc
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.zshrc
+[2025-03-24 04:12:57] INFO: Found valid path: /etc/bash.bashrc
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.bashrc
+[2025-03-24 04:12:57] INFO: Found valid path: /etc/gitconfig
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.gitconfig
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/Code
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/micro
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/kate
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/kdeconnect
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/kwinrc
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/konsolerc
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/okularrc
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/google-chrome
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/microsoft-edge
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/BraveSoftware
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/nano
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/ghostwriter
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/fontconfig
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/gtk-3.0
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/gtk-4.0
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/Mailspring
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/op
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/pinta
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/jack
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/pipewire
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.config/ibus
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.local/share/audacity
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.local/zed.app
+[2025-03-24 04:12:57] INFO: Found valid path: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:12:57] INFO: Found 32 valid configuration paths to backup
+[2025-03-24 04:12:57] INFO: Backing up system path (with sudo): /etc/ssh/ssh_config
+[2025-03-24 04:12:57] INFO: Successfully backed up: /etc/ssh/ssh_config
+[2025-03-24 04:12:57] INFO: Backing up system path (with sudo): /etc/zsh/zshrc
+[2025-03-24 04:12:57] INFO: Successfully backed up: /etc/zsh/zshrc
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.zshrc
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.zshrc
+[2025-03-24 04:12:57] INFO: Backing up system path (with sudo): /etc/bash.bashrc
+[2025-03-24 04:12:57] INFO: Successfully backed up: /etc/bash.bashrc
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.bashrc
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.bashrc
+[2025-03-24 04:12:57] INFO: Backing up system path (with sudo): /etc/gitconfig
+[2025-03-24 04:12:57] INFO: Successfully backed up: /etc/gitconfig
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.gitconfig
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.gitconfig
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/Code
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/Code
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/micro
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/micro
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/kate
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/kate
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/kdeconnect
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/kdeconnect
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/kwinrc
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/kwinrc
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/konsolerc
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/konsolerc
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/okularrc
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/okularrc
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/google-chrome
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/google-chrome
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/microsoft-edge
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/microsoft-edge
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/BraveSoftware
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/BraveSoftware
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/nano
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/nano
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/ghostwriter
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/ghostwriter
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/fontconfig
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/fontconfig
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/gtk-3.0
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/gtk-3.0
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/gtk-4.0
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/gtk-4.0
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/Mailspring
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/Mailspring
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/op
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/op
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/pinta
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/pinta
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/jack
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/jack
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/pipewire
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/pipewire
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.config/ibus
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.config/ibus
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.local/share/audacity
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.local/share/audacity
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.local/zed.app
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.local/zed.app
+[2025-03-24 04:12:57] INFO: Backing up user path: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:12:57] ERROR: Failed to backup: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:12:57] INFO: Backup process completed. Files stored in /restart/config-backup
+[2025-03-24 04:12:57] INFO: Set ownership of backup directory to current user
+[2025-03-24 04:13:57] INFO: Starting configuration backup process
+[2025-03-24 04:13:57] INFO: Found valid path: /etc/ssh/ssh_config
+[2025-03-24 04:13:57] INFO: Found valid path: /etc/zsh/zshrc
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.zshrc
+[2025-03-24 04:13:57] INFO: Found valid path: /etc/bash.bashrc
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.bashrc
+[2025-03-24 04:13:57] INFO: Found valid path: /etc/gitconfig
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.gitconfig
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/Code
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/micro
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/kate
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/kdeconnect
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/kwinrc
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/konsolerc
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/okularrc
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/google-chrome
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/microsoft-edge
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/BraveSoftware
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/nano
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/ghostwriter
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/fontconfig
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/gtk-3.0
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/gtk-4.0
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/Mailspring
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/op
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/pinta
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/jack
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/pipewire
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.config/ibus
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.local/share/audacity
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.local/zed.app
+[2025-03-24 04:13:57] INFO: Found valid path: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:13:57] INFO: Found 32 valid configuration paths to backup
+[2025-03-24 04:13:57] INFO: Creating target directories for all paths
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/etc/ssh
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/etc/zsh
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/etc
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/etc
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.local/share
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.local
+[2025-03-24 04:13:57] INFO: Created directory: /restart/config-backup/home/scott/.local/state
+[2025-03-24 04:13:57] INFO: Backing up system path: /etc/ssh/ssh_config
+[2025-03-24 04:13:57] INFO: Successfully backed up: /etc/ssh/ssh_config
+[2025-03-24 04:13:57] INFO: Backing up system path: /etc/zsh/zshrc
+[2025-03-24 04:13:57] INFO: Successfully backed up: /etc/zsh/zshrc
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.zshrc
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.zshrc
+[2025-03-24 04:13:57] INFO: Backing up system path: /etc/bash.bashrc
+[2025-03-24 04:13:57] INFO: Successfully backed up: /etc/bash.bashrc
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.bashrc
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.bashrc
+[2025-03-24 04:13:57] INFO: Backing up system path: /etc/gitconfig
+[2025-03-24 04:13:57] INFO: Successfully backed up: /etc/gitconfig
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.gitconfig
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.gitconfig
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/Code
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/Code
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/micro
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/micro
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/kate
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/kate
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/kdeconnect
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/kdeconnect
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/kwinrc
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/kwinrc
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/konsolerc
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/konsolerc
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/okularrc
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/okularrc
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/google-chrome
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/google-chrome
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/microsoft-edge
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/microsoft-edge
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/BraveSoftware
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/BraveSoftware
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/nano
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/nano
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/ghostwriter
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/ghostwriter
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/fontconfig
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/fontconfig
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/gtk-3.0
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/gtk-3.0
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/gtk-4.0
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/gtk-4.0
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/Mailspring
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/Mailspring
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/op
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/op
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/pinta
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/pinta
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/jack
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/jack
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/pipewire
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/pipewire
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.config/ibus
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.config/ibus
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.local/share/audacity
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.local/share/audacity
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.local/zed.app
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.local/zed.app
+[2025-03-24 04:13:57] INFO: Backing up user path: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:13:57] INFO: Successfully backed up: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:13:57] INFO: Backup process completed. Files stored in /restart/config-backup
+[2025-03-24 04:13:57] INFO: Set ownership of user files to current user
+[2025-03-24 04:13:57] INFO: Set permissions on backup directory
+[2025-03-24 04:16:27] INFO: Starting configuration backup process
+[2025-03-24 04:16:27] INFO: Found valid path: /etc/ssh/ssh_config
+[2025-03-24 04:16:27] INFO: Found valid path: /etc/zsh/zshrc
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.zshrc
+[2025-03-24 04:16:27] INFO: Found valid path: /etc/bash.bashrc
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.bashrc
+[2025-03-24 04:16:27] INFO: Found valid path: /etc/gitconfig
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.gitconfig
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/Code
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/micro
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/kate
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/kdeconnect
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/kwinrc
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/konsolerc
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/okularrc
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/google-chrome
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/microsoft-edge
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/BraveSoftware
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/nano
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/ghostwriter
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/fontconfig
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/gtk-3.0
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/gtk-4.0
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/Mailspring
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/op
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/pinta
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/jack
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/pipewire
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.config/ibus
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.local/share/audacity
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.local/zed.app
+[2025-03-24 04:16:27] INFO: Found valid path: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:16:27] INFO: Found 32 valid configuration paths to backup
+[2025-03-24 04:16:27] INFO: Creating target directories for all paths
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/etc/ssh
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/etc/zsh
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/etc
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/etc
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.local/share
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.local
+[2025-03-24 04:16:27] INFO: Created directory: /restart/config-backup/home/scott/.local/state
+[2025-03-24 04:16:27] INFO: Backing up system path: /etc/ssh/ssh_config
+[2025-03-24 04:16:27] INFO: Successfully backed up: /etc/ssh/ssh_config
+[2025-03-24 04:16:27] INFO: Backing up system path: /etc/zsh/zshrc
+[2025-03-24 04:16:27] INFO: Successfully backed up: /etc/zsh/zshrc
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.zshrc
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.zshrc
+[2025-03-24 04:16:27] INFO: Backing up system path: /etc/bash.bashrc
+[2025-03-24 04:16:27] INFO: Successfully backed up: /etc/bash.bashrc
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.bashrc
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.bashrc
+[2025-03-24 04:16:27] INFO: Backing up system path: /etc/gitconfig
+[2025-03-24 04:16:27] INFO: Successfully backed up: /etc/gitconfig
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.gitconfig
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.gitconfig
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/Code
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.config/Code
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/micro
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.config/micro
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/kate
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.config/kate
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/kdeconnect
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.config/kdeconnect
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/kwinrc
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.config/kwinrc
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/konsolerc
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.config/konsolerc
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/okularrc
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.config/okularrc
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/google-chrome
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.config/google-chrome
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/microsoft-edge
+[2025-03-24 04:16:27] ERROR: Failed to backup: /home/scott/.config/microsoft-edge
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/BraveSoftware
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.config/BraveSoftware
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/nano
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.config/nano
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/ghostwriter
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.config/ghostwriter
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/fontconfig
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.config/fontconfig
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/gtk-3.0
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.config/gtk-3.0
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/gtk-4.0
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.config/gtk-4.0
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/Mailspring
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.config/Mailspring
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/op
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.config/op
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/pinta
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.config/pinta
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/jack
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.config/jack
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/pipewire
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.config/pipewire
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.config/ibus
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.config/ibus
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.local/share/audacity
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.local/share/audacity
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.local/zed.app
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.local/zed.app
+[2025-03-24 04:16:27] INFO: Backing up user path: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:16:27] INFO: Successfully backed up: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:16:27] INFO: Backup process completed. Files stored in /restart/config-backup
+[2025-03-24 04:16:27] INFO: Set ownership of user files to current user
+[2025-03-24 04:16:27] INFO: Set permissions on backup directory
+[2025-03-24 04:18:43] INFO: Starting configuration backup process
+[2025-03-24 04:18:43] INFO: Found valid path: /etc/ssh/ssh_config
+[2025-03-24 04:18:43] INFO: Found valid path: /etc/zsh/zshrc
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.zshrc
+[2025-03-24 04:18:43] INFO: Found valid path: /etc/bash.bashrc
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.bashrc
+[2025-03-24 04:18:43] INFO: Found valid path: /etc/gitconfig
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.gitconfig
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/Code
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/micro
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/kate
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/kdeconnect
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/kwinrc
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/konsolerc
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/okularrc
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/google-chrome
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/microsoft-edge
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/BraveSoftware
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/nano
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/ghostwriter
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/fontconfig
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/gtk-3.0
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/gtk-4.0
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/Mailspring
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/op
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/pinta
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/jack
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/pipewire
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.config/ibus
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.local/share/audacity
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.local/zed.app
+[2025-03-24 04:18:43] INFO: Found valid path: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:18:43] INFO: Found 32 valid configuration paths to backup
+[2025-03-24 04:18:43] INFO: Creating target directories for all paths
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/etc/ssh
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/etc/zsh
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/etc
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/etc
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.local/share
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.local
+[2025-03-24 04:18:43] INFO: Created directory: /restart/config-backup/home/scott/.local/state
+[2025-03-24 04:18:43] INFO: Backing up system path: /etc/ssh/ssh_config
+[2025-03-24 04:18:43] INFO: Successfully backed up: /etc/ssh/ssh_config
+[2025-03-24 04:18:43] INFO: Backing up system path: /etc/zsh/zshrc
+[2025-03-24 04:18:43] INFO: Successfully backed up: /etc/zsh/zshrc
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.zshrc
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.zshrc
+[2025-03-24 04:18:43] INFO: Backing up system path: /etc/bash.bashrc
+[2025-03-24 04:18:43] INFO: Successfully backed up: /etc/bash.bashrc
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.bashrc
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.bashrc
+[2025-03-24 04:18:43] INFO: Backing up system path: /etc/gitconfig
+[2025-03-24 04:18:43] INFO: Successfully backed up: /etc/gitconfig
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.gitconfig
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.gitconfig
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/Code
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.config/Code
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/micro
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.config/micro
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/kate
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.config/kate
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/kdeconnect
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.config/kdeconnect
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/kwinrc
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.config/kwinrc
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/konsolerc
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.config/konsolerc
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/okularrc
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.config/okularrc
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/google-chrome
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.config/google-chrome
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/microsoft-edge
+[2025-03-24 04:18:43] ERROR: Failed to backup: /home/scott/.config/microsoft-edge
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/BraveSoftware
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.config/BraveSoftware
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/nano
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.config/nano
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/ghostwriter
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.config/ghostwriter
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/fontconfig
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.config/fontconfig
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/gtk-3.0
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.config/gtk-3.0
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/gtk-4.0
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.config/gtk-4.0
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/Mailspring
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.config/Mailspring
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/op
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.config/op
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/pinta
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.config/pinta
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/jack
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.config/jack
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/pipewire
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.config/pipewire
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.config/ibus
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.config/ibus
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.local/share/audacity
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.local/share/audacity
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.local/zed.app
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.local/zed.app
+[2025-03-24 04:18:43] INFO: Backing up user path: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:18:43] INFO: Successfully backed up: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:18:43] INFO: Backup process completed. Files stored in /restart/config-backup
+[2025-03-24 04:18:43] INFO: Set ownership of user files to current user
+[2025-03-24 04:18:43] INFO: Set permissions on backup directory
+[2025-03-24 04:20:36] INFO: Starting configuration backup process
+[2025-03-24 04:20:36] INFO: Found valid path: /etc/ssh/ssh_config
+[2025-03-24 04:20:36] WARNING: Source path does not exist: /~/.ssh
+[2025-03-24 04:20:36] INFO: Found valid path: /etc/zsh/zshrc
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.zshrc
+[2025-03-24 04:20:36] INFO: Found valid path: /etc/bash.bashrc
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.bashrc
+[2025-03-24 04:20:36] INFO: Found valid path: /etc/gitconfig
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.gitconfig
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/Code
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/micro
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/kate
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/kdeconnect
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/kwinrc
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/konsolerc
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/okularrc
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/google-chrome
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/microsoft-edge
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/BraveSoftware
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/nano
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/ghostwriter
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/fontconfig
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/gtk-3.0
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/gtk-4.0
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/Mailspring
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/op
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/pinta
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/jack
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/pipewire
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.config/ibus
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.local/share/audacity
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.local/zed.app
+[2025-03-24 04:20:36] INFO: Found valid path: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:20:36] INFO: Found 32 valid configuration paths to backup
+[2025-03-24 04:20:36] INFO: Creating target directories for all paths
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/etc/ssh
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/etc/zsh
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/etc
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/etc
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.local/share
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.local
+[2025-03-24 04:20:36] INFO: Created directory: /restart/config-backup/home/scott/.local/state
+[2025-03-24 04:20:36] INFO: Backing up system path: /etc/ssh/ssh_config
+[2025-03-24 04:20:36] INFO: Successfully backed up: /etc/ssh/ssh_config
+[2025-03-24 04:20:36] INFO: Backing up system path: /etc/zsh/zshrc
+[2025-03-24 04:20:36] INFO: Successfully backed up: /etc/zsh/zshrc
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.zshrc
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.zshrc
+[2025-03-24 04:20:36] INFO: Backing up system path: /etc/bash.bashrc
+[2025-03-24 04:20:36] INFO: Successfully backed up: /etc/bash.bashrc
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.bashrc
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.bashrc
+[2025-03-24 04:20:36] INFO: Backing up system path: /etc/gitconfig
+[2025-03-24 04:20:36] INFO: Successfully backed up: /etc/gitconfig
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.gitconfig
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.gitconfig
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/Code
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.config/Code
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/micro
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.config/micro
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/kate
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.config/kate
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/kdeconnect
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.config/kdeconnect
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/kwinrc
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.config/kwinrc
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/konsolerc
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.config/konsolerc
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/okularrc
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.config/okularrc
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/google-chrome
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.config/google-chrome
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/microsoft-edge
+[2025-03-24 04:20:36] ERROR: Failed to backup: /home/scott/.config/microsoft-edge
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/BraveSoftware
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.config/BraveSoftware
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/nano
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.config/nano
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/ghostwriter
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.config/ghostwriter
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/fontconfig
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.config/fontconfig
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/gtk-3.0
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.config/gtk-3.0
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/gtk-4.0
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.config/gtk-4.0
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/Mailspring
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.config/Mailspring
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/op
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.config/op
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/pinta
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.config/pinta
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/jack
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.config/jack
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/pipewire
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.config/pipewire
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.config/ibus
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.config/ibus
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.local/share/audacity
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.local/share/audacity
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.local/zed.app
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.local/zed.app
+[2025-03-24 04:20:36] INFO: Backing up user path: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:20:36] INFO: Successfully backed up: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:20:36] INFO: Backup process completed. Files stored in /restart/config-backup
+[2025-03-24 04:20:36] INFO: Set ownership of user files to current user
+[2025-03-24 04:20:36] INFO: Set permissions on backup directory
+[2025-03-24 04:23:49] INFO: Starting configuration backup process
+[2025-03-24 04:23:49] INFO: Found valid path: /etc/ssh/ssh_config
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.ssh
+[2025-03-24 04:23:49] INFO: Found valid path: /etc/zsh/zshrc
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.zshrc
+[2025-03-24 04:23:49] INFO: Found valid path: /etc/bash.bashrc
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.bashrc
+[2025-03-24 04:23:49] INFO: Found valid path: /etc/gitconfig
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.gitconfig
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/Code
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/micro
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/kate
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/kdeconnect
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/kwinrc
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/konsolerc
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/okularrc
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/google-chrome
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/microsoft-edge
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/BraveSoftware
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/nano
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/ghostwriter
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/fontconfig
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/gtk-3.0
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/gtk-4.0
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/Mailspring
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/op
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/pinta
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/jack
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/pipewire
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.config/ibus
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.local/share/audacity
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.local/zed.app
+[2025-03-24 04:23:49] INFO: Found valid path: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:23:49] INFO: Found 33 valid configuration paths to backup
+[2025-03-24 04:23:49] INFO: Creating target directories for all paths
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/etc/ssh
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/etc/zsh
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/etc
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/etc
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.local/share
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.local
+[2025-03-24 04:23:49] INFO: Created directory: /restart/config-backup/home/scott/.local/state
+[2025-03-24 04:23:49] INFO: Backing up system path: /etc/ssh/ssh_config
+[2025-03-24 04:23:49] INFO: Successfully backed up: /etc/ssh/ssh_config
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.ssh
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.ssh
+[2025-03-24 04:23:49] INFO: Backing up system path: /etc/zsh/zshrc
+[2025-03-24 04:23:49] INFO: Successfully backed up: /etc/zsh/zshrc
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.zshrc
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.zshrc
+[2025-03-24 04:23:49] INFO: Backing up system path: /etc/bash.bashrc
+[2025-03-24 04:23:49] INFO: Successfully backed up: /etc/bash.bashrc
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.bashrc
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.bashrc
+[2025-03-24 04:23:49] INFO: Backing up system path: /etc/gitconfig
+[2025-03-24 04:23:49] INFO: Successfully backed up: /etc/gitconfig
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.gitconfig
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.gitconfig
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/Code
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.config/Code
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/micro
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.config/micro
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/kate
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.config/kate
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/kdeconnect
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.config/kdeconnect
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/kwinrc
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.config/kwinrc
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/konsolerc
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.config/konsolerc
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/okularrc
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.config/okularrc
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/google-chrome
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.config/google-chrome
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/microsoft-edge
+[2025-03-24 04:23:49] ERROR: Failed to backup: /home/scott/.config/microsoft-edge
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/BraveSoftware
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.config/BraveSoftware
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/nano
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.config/nano
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/ghostwriter
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.config/ghostwriter
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/fontconfig
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.config/fontconfig
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/gtk-3.0
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.config/gtk-3.0
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/gtk-4.0
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.config/gtk-4.0
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/Mailspring
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.config/Mailspring
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/op
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.config/op
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/pinta
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.config/pinta
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/jack
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.config/jack
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/pipewire
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.config/pipewire
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.config/ibus
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.config/ibus
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.local/share/audacity
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.local/share/audacity
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.local/zed.app
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.local/zed.app
+[2025-03-24 04:23:49] INFO: Backing up user path: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:23:49] INFO: Successfully backed up: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:23:49] INFO: Backup process completed. Files stored in /restart/config-backup
+[2025-03-24 04:23:49] INFO: Set ownership of user files to current user
+[2025-03-24 04:23:49] INFO: Set permissions on backup directory
+[2025-03-24 04:26:02] INFO: Starting configuration backup process
+[2025-03-24 04:26:02] INFO: Found valid path: /etc/ssh/ssh_config
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.ssh
+[2025-03-24 04:26:02] INFO: Found valid path: /etc/zsh/zshrc
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.zshrc
+[2025-03-24 04:26:02] INFO: Found valid path: /etc/bash.bashrc
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.bashrc
+[2025-03-24 04:26:02] INFO: Found valid path: /etc/gitconfig
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.gitconfig
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/Code
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/micro
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/kate
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/kdeconnect
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/kwinrc
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/konsolerc
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/okularrc
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/google-chrome
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/microsoft-edge
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/BraveSoftware
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/nano
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/ghostwriter
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/fontconfig
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/gtk-3.0
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/gtk-4.0
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/Mailspring
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/op
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/pinta
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/jack
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/pipewire
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.config/ibus
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.local/share/audacity
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.local/zed.app
+[2025-03-24 04:26:02] INFO: Found valid path: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:26:02] INFO: Found 33 valid configuration paths to backup
+[2025-03-24 04:26:02] INFO: Creating target directories for all paths
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/etc/ssh
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/etc/zsh
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/etc
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/etc
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.config
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.local/share
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.local
+[2025-03-24 04:26:02] INFO: Created directory: /restart/config-backup/home/scott/.local/state
+[2025-03-24 04:26:02] INFO: Backing up system path: /etc/ssh/ssh_config
+[2025-03-24 04:26:02] INFO: Successfully backed up: /etc/ssh/ssh_config
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.ssh
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.ssh
+[2025-03-24 04:26:02] INFO: Backing up system path: /etc/zsh/zshrc
+[2025-03-24 04:26:02] INFO: Successfully backed up: /etc/zsh/zshrc
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.zshrc
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.zshrc
+[2025-03-24 04:26:02] INFO: Backing up system path: /etc/bash.bashrc
+[2025-03-24 04:26:02] INFO: Successfully backed up: /etc/bash.bashrc
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.bashrc
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.bashrc
+[2025-03-24 04:26:02] INFO: Backing up system path: /etc/gitconfig
+[2025-03-24 04:26:02] INFO: Successfully backed up: /etc/gitconfig
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.gitconfig
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.gitconfig
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/Code
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.config/Code
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/micro
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.config/micro
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/kate
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.config/kate
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/kdeconnect
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.config/kdeconnect
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/kwinrc
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.config/kwinrc
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.config/plasma-org.kde.plasma.desktop-appletsrc
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/konsolerc
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.config/konsolerc
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/okularrc
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.config/okularrc
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/google-chrome
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.config/google-chrome
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/microsoft-edge
+[2025-03-24 04:26:02] ERROR: Failed to backup: /home/scott/.config/microsoft-edge
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/BraveSoftware
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.config/BraveSoftware
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/nano
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.config/nano
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/ghostwriter
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.config/ghostwriter
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/fontconfig
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.config/fontconfig
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/gtk-3.0
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.config/gtk-3.0
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/gtk-4.0
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.config/gtk-4.0
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/Mailspring
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.config/Mailspring
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/op
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.config/op
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/pinta
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.config/pinta
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/jack
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.config/jack
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/pipewire
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.config/pipewire
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.config/ibus
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.config/ibus
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.local/share/audacity
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.local/share/audacity
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.local/zed.app
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.local/zed.app
+[2025-03-24 04:26:02] INFO: Backing up user path: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:26:02] INFO: Successfully backed up: /home/scott/.local/state/warp-terminal
+[2025-03-24 04:26:02] INFO: Backup process completed. Files stored in /restart/config-backup
+[2025-03-24 04:26:02] INFO: Set ownership of user files to current user
+[2025-03-24 04:26:02] INFO: Set permissions on backup directories while preserving file permissions
+[2025-03-24 04:26:02] INFO: Securing SSH directory permissions

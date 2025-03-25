@@ -23,34 +23,6 @@ if [[ "${EUID}" -ne 0 ]]; then
     exit 1
 fi
 
-# Check for restored configurations
-RESTORED_CONFIGS="/restart/critical_backups/config_mapping.txt"
-RESTORED_SYSCTL_CONFIG=""
-# RESTORED_TUNED_CONFIG is defined for future use if needed
-
-if [[ -f "${RESTORED_CONFIGS}" ]]; then
-    echo "Found restored configuration mapping file"
-    # shellcheck disable=SC1090
-    source "${RESTORED_CONFIGS}"
-    
-    # Check for specific system tuning configurations
-    if [[ -n "${GENERAL_CONFIGS_PATH}" ]]; then
-        if [[ -d "${GENERAL_CONFIGS_PATH}/home/.config/system-tuning" ]]; then
-            RESTORED_SYSCTL_CONFIG="${GENERAL_CONFIGS_PATH}/home/.config/system-tuning"
-            echo "Found restored system tuning configuration at ${RESTORED_SYSCTL_CONFIG}"
-        elif [[ -d "${GENERAL_CONFIGS_PATH}/system" ]]; then
-            RESTORED_SYSCTL_CONFIG="${GENERAL_CONFIGS_PATH}/system"
-            echo "Found restored system configurations at ${RESTORED_SYSCTL_CONFIG}"
-        fi
-    fi
-    
-    # Check if we have specific sysctl configurations in script-referenced configs
-    if [[ -n "${SCRIPT_CONFIGS_PATH}" ]] && [[ -d "${SCRIPT_CONFIGS_PATH}/etc/sysctl.d" ]]; then
-        RESTORED_SYSCTL_CONFIG="${SCRIPT_CONFIGS_PATH}/etc/sysctl.d"
-        echo "Found restored sysctl configurations at ${RESTORED_SYSCTL_CONFIG}"
-    fi
-fi
-
 # Display welcome message
 section "Advanced System Tuning"
 echo "This script will apply advanced performance tuning configurations for:"
@@ -72,14 +44,8 @@ fi
 # ======================================================================
 section "Configuring Advanced sysctl Parameters"
 
-# Check if we have restored sysctl configurations
-if [[ -n "${RESTORED_SYSCTL_CONFIG}" ]] && [[ -f "${RESTORED_SYSCTL_CONFIG}/99-system-optimizations.conf" ]]; then
-    echo "Restoring sysctl configuration from backup..."
-    cp -f "${RESTORED_SYSCTL_CONFIG}/99-system-optimizations.conf" /etc/sysctl.d/
-    echo "✓ Restored sysctl configuration"
-else
-    echo "Creating sysctl configuration..."
-    cat > /etc/sysctl.d/99-system-optimizations.conf << 'EOF'
+echo "Creating sysctl configuration..."
+cat > /etc/sysctl.d/99-system-optimizations.conf << 'EOF'
 # -----------------------------------------------------------------------------------
 # MEMORY MANAGEMENT
 # -----------------------------------------------------------------------------------
@@ -119,7 +85,6 @@ net.ipv4.tcp_wmem = 4096 65536 16777216 # TCP send buffer sizes (min, default, m
 net.core.rmem_max = 16777216      # Maximum receive socket buffer size
 net.core.wmem_max = 16777216      # Maximum send socket buffer size
 net.ipv4.tcp_mtu_probing = 1      # Enable MTU probing
-net.ipv4.tcp_congestion_control = cubic # Use cubic congestion control algorithm
 
 # IPv4 networking
 net.ipv4.ip_local_port_range = 1024 65535 # Increase available local ports
@@ -133,9 +98,7 @@ net.ipv4.tcp_keepalive_intvl = 15 # Interval between keepalive probes
 # -----------------------------------------------------------------------------------
 
 # General kernel parameters
-kernel.sched_migration_cost_ns = 5000000 # Increase scheduler migration cost to reduce task switches
 kernel.sched_autogroup_enabled = 1 # Enable scheduler autogroups (better desktop experience)
-kernel.sched_latency_ns = 4000000  # Scheduler latency target
 kernel.pid_max = 4194304          # Increase maximum number of process IDs
 kernel.threads-max = 4194304      # Increase maximum number of threads
 
@@ -183,7 +146,7 @@ vm.dirty_bytes = 524288000         # 500MB - When to force synchronous writeback
 # Allow regular users to see kernel logs (useful for debugging)
 kernel.dmesg_restrict = 0
 EOF
-fi
+
 
 echo "Applying sysctl settings..."
 sysctl -p /etc/sysctl.d/99-system-optimizations.conf
@@ -195,19 +158,7 @@ echo "✓ Configured advanced sysctl parameters"
 # ======================================================================
 section "Setting Up System Profile Manager"
 
-# Check if we have a restored toggle script
-TOGGLE_SCRIPT_RESTORED=false
-if [[ -n "${RESTORED_SYSCTL_CONFIG}" ]] && [[ -f "${RESTORED_SYSCTL_CONFIG}/toggle-system-profile" ]]; then
-    echo "Restoring system profile toggle script from backup..."
-    cp -f "${RESTORED_SYSCTL_CONFIG}/toggle-system-profile" /usr/local/bin/toggle-system-profile
-    chmod +x /usr/local/bin/toggle-system-profile
-    TOGGLE_SCRIPT_RESTORED=true
-    echo "✓ Restored system profile toggle script"
-fi
-
-if [[ "${TOGGLE_SCRIPT_RESTORED}" = false ]]; then
-    echo "Creating system profile toggle script..."
-    cat > /usr/local/bin/toggle-system-profile << 'EOF'
+cat > /usr/local/bin/toggle-system-profile << 'EOF'
 #!/bin/bash
 # Toggle between performance and normal system profiles
 
@@ -270,8 +221,7 @@ else
 fi
 EOF
 
-    chmod +x /usr/local/bin/toggle-system-profile
-fi
+chmod +x /usr/local/bin/toggle-system-profile
 
 # Create desktop entry for system profile toggle
 if [[ ! -f "/usr/share/applications/toggle-system-profile.desktop" ]]; then
@@ -313,33 +263,6 @@ section "NVIDIA GPU Optimizations"
 if lspci | grep -i nvidia > /dev/null || true; then
     echo "NVIDIA GPU detected, applying optimizations..."
     
-    # Check for restored NVIDIA configurations
-    NVIDIA_CONFIG_RESTORED=false
-    if [[ -n "${RESTORED_SYSCTL_CONFIG}" ]] && [[ -d "${RESTORED_SYSCTL_CONFIG}/nvidia" ]]; then
-        echo "Restoring NVIDIA configurations from backup..."
-        
-        if [[ -f "${RESTORED_SYSCTL_CONFIG}/nvidia/20-nvidia.conf" ]]; then
-            mkdir -p /etc/X11/xorg.conf.d/
-            cp -f "${RESTORED_SYSCTL_CONFIG}/nvidia/20-nvidia.conf" /etc/X11/xorg.conf.d/
-            echo "✓ Restored NVIDIA X11 configuration"
-            NVIDIA_CONFIG_RESTORED=true
-        fi
-        
-        if [[ -f "${RESTORED_SYSCTL_CONFIG}/nvidia/30-nvidia-settings.sh" ]]; then
-            mkdir -p /etc/X11/xinit/xinitrc.d/
-            cp -f "${RESTORED_SYSCTL_CONFIG}/nvidia/30-nvidia-settings.sh" /etc/X11/xinit/xinitrc.d/
-            chmod +x /etc/X11/xinit/xinitrc.d/30-nvidia-settings.sh
-            echo "✓ Restored NVIDIA settings script"
-        fi
-        
-        if [[ -f "${RESTORED_SYSCTL_CONFIG}/nvidia/cuda-optimization.sh" ]]; then
-            cp -f "${RESTORED_SYSCTL_CONFIG}/nvidia/cuda-optimization.sh" /etc/profile.d/
-            chmod +x /etc/profile.d/cuda-optimization.sh
-            echo "✓ Restored CUDA optimization script"
-        fi
-    fi
-    
-    # Create NVIDIA configuration if not restored
     if [[ "${NVIDIA_CONFIG_RESTORED}" = false ]]; then
         # Create NVIDIA configuration directory if it doesn't exist
         mkdir -p /etc/X11/xorg.conf.d/
@@ -408,14 +331,6 @@ fi
 # ======================================================================
 section "Storage I/O Scheduler Optimization"
 
-# Check for restored I/O scheduler rules
-if [[ -n "${RESTORED_SYSCTL_CONFIG}" ]] && [[ -f "${RESTORED_SYSCTL_CONFIG}/io-scheduler/60-ioschedulers.rules" ]]; then
-    echo "Restoring I/O scheduler rules from backup..."
-    mkdir -p /etc/udev/rules.d/
-    cp -f "${RESTORED_SYSCTL_CONFIG}/io-scheduler/60-ioschedulers.rules" /etc/udev/rules.d/
-    echo "✓ Restored I/O scheduler rules"
-else
-    echo "Configuring optimal I/O schedulers for different storage types..."
     cat > /etc/udev/rules.d/60-ioschedulers.rules << EOF
 # Set scheduler for NVMe drives
 ACTION=="add|change", KERNEL=="nvme[0-9]*", ATTR{queue/scheduler}="none"
@@ -426,7 +341,6 @@ ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="0", ATTR{queue
 # Set scheduler for HDDs
 ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="bfq"
 EOF
-fi
 
 # Apply to current devices
 echo "Applying I/O scheduler settings to current devices..."
@@ -463,15 +377,7 @@ echo "✓ I/O scheduler optimization completed"
 # ======================================================================
 section "System Resource Limits Configuration"
 
-# Check for restored system limits
-if [[ -n "${RESTORED_SYSCTL_CONFIG}" ]] && [[ -f "${RESTORED_SYSCTL_CONFIG}/limits/99-system-limits.conf" ]]; then
-    echo "Restoring system resource limits from backup..."
-    mkdir -p /etc/security/limits.d/
-    cp -f "${RESTORED_SYSCTL_CONFIG}/limits/99-system-limits.conf" /etc/security/limits.d/
-    echo "✓ Restored system resource limits"
-else
-    echo "Configuring system resource limits..."
-    cat > /etc/security/limits.d/99-system-limits.conf << EOF
+cat > /etc/security/limits.d/99-system-limits.conf << EOF
 # Increase file limits for all users
 *               soft    nofile          65536
 *               hard    nofile          65536
@@ -484,7 +390,6 @@ else
 @sudo           -       nproc           unlimited
 @sudo           -       memlock         unlimited
 EOF
-fi
 
 echo "✓ System resource limits configured"
 
@@ -524,7 +429,7 @@ Terminal=false
 Type=Application
 Categories=System;
 EOF
-                echo "✓ Created desktop entry for ${display_name} Optimizer"
+	        echo "✓ Created desktop entry for ${display_name} Optimizer"
             fi
         fi
     done
@@ -665,7 +570,7 @@ echo "Configuring CPU governor..."
 if [[ -f /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor ]]; then
     for governor in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
         echo "performance" > "${governor}"
-    done
+    done								
     echo "CPU governor set to performance"
 else
     echo "CPU governor settings not available"

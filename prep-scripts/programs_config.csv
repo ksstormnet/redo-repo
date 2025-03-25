@@ -1,0 +1,34 @@
+Program,Config File Path
+SSH,/etc/ssh/ssh_config
+SSH (user),~/.ssh
+ZSH,/etc/zsh/zshrc
+ZSH (user),~/.zshrc
+Bash,/etc/bash.bashrc
+Bash (user),~/.bashrc
+Git,/etc/gitconfig
+Git (user),~/.gitconfig
+VS Code,~/.config/Code
+Micro,~/.config/micro
+Kate,~/.config/kate
+KDE Connect,~/.config/kdeconnect
+KWin,~/.config/kwinrc
+Plasma Desktop,~/.config/plasma-org.kde.plasma.desktop-appletsrc
+Konsole,~/.config/konsolerc
+Okular,~/.config/okularrc
+Google Chrome,~/.config/google-chrome
+Microsoft Edge,~/.config/microsoft-edge
+Brave Browser,~/.config/BraveSoftware
+Nano,~/.config/nano
+Ghostwriter,~/.config/ghostwriter
+Fontconfig,~/.config/fontconfig
+GTK-3.0,~/.config/gtk-3.0
+GTK-4.0,~/.config/gtk-4.0
+Mailspring,~/.config/Mailspring
+1Password,~/.config/op
+Pinta,~/.config/pinta
+Jack,~/.config/jack
+Pipewire,~/.config/pipewire
+IBus,~/.config/ibus
+Audacity,~/.local/share/audacity
+Zed,~/.local/zed.app
+Warp Terminal,~/.local/state/warp-terminal

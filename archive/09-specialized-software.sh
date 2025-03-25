@@ -12,9 +12,7 @@ set -e
 if [[ -n "${CONFIG_FUNCTIONS_PATH}" ]] && [[ -f "${CONFIG_FUNCTIONS_PATH}" ]]; then
     source "${CONFIG_FUNCTIONS_PATH}"
 else
-    echo "ERROR: Configuration management functions not found."
-    echo "Please ensure the CONFIG_FUNCTIONS_PATH environment variable is set correctly."
-    exit 1
+    source "./config-management-functions.sh"
 fi
 
 # Source the backup configuration mapping if available
@@ -125,11 +123,6 @@ DARKTABLE_CONFIG_FILES=(
     "${USER_HOME}/.config/darktable/darktablerc"
 )
 
-CALIBRE_CONFIG_FILES=(
-    "${USER_HOME}/.config/calibre/global.py"
-    "${USER_HOME}/.config/calibre/preferences.py"
-)
-
 OKULAR_CONFIG_FILES=(
     "${USER_HOME}/.config/okularrc"
 )
@@ -200,7 +193,6 @@ handle_pre_installation_config "vlc" "${VLC_CONFIG_FILES[@]}"
 handle_pre_installation_config "virtualbox" "${VIRTUALBOX_CONFIG_FILES[@]}"
 handle_pre_installation_config "pinta" "${PINTA_CONFIG_FILES[@]}"
 handle_pre_installation_config "darktable" "${DARKTABLE_CONFIG_FILES[@]}"
-handle_pre_installation_config "calibre" "${CALIBRE_CONFIG_FILES[@]}"
 handle_pre_installation_config "okular" "${OKULAR_CONFIG_FILES[@]}"
 handle_pre_installation_config "gwenview" "${GWENVIEW_CONFIG_FILES[@]}"
 handle_pre_installation_config "ghostwriter" "${GHOSTWRITER_CONFIG_FILES[@]}"
@@ -287,6 +279,22 @@ section "Installing Graphics and Design Tools"
 install_packages "Graphics & Design" \
     darktable
 
+# Remove FireFox apt package and install the snap
+echo "Removing firefox apt package"
+apt remove --purge -y firefox
+apt autoremove -y
+echo "✓ Install FireFox via snap using the next script file."
+
+# Install raindrop via snap
+echo "Installing Raindrop.io via snap..."
+snap install raindrop
+echo "✓ Installed Raindrop via snap"
+
+# Install HeidiSQL via snap
+echo "Installing HeidiSQL via snap..."
+snap install heidisql-wine
+echo "✓ Installed HeidiSQL via snap"
+
 # Install Pinta via snap instead of apt
 echo "Installing Pinta via snap..."
 snap install pinta
@@ -315,19 +323,12 @@ section "Installing Office and Productivity Tools"
 
 # Install office and productivity tools
 install_packages "Office & Productivity" \
-    calibre \
     okular \
     gwenview \
     ghostwriter
 
 # Create directories for configs
-mkdir -p "${USER_HOME}/.config/calibre"
 mkdir -p "${USER_HOME}/.config/ghostwriter"
-
-# Restore Calibre configuration from backup if available
-if [[ -n "${CONFIG_BACKUPS_BASE}" ]] && [[ -d "${CONFIG_BACKUPS_BASE}/calibre" ]]; then
-    restore_config "Calibre" "${CONFIG_BACKUPS_BASE}/calibre" "${USER_HOME}/.config/calibre"
-fi
 
 # Restore Okular configuration from backup if available
 if [[ -n "${CONFIG_BACKUPS_BASE}" ]] && [[ -f "${CONFIG_BACKUPS_BASE}/okularrc" ]]; then
@@ -357,7 +358,6 @@ if [[ -n "${CONFIG_BACKUPS_BASE}" ]] && [[ -d "${CONFIG_BACKUPS_BASE}/ghostwrite
 fi
 
 # Handle configuration files
-handle_installed_software_config "calibre" "${CALIBRE_CONFIG_FILES[@]}"
 handle_installed_software_config "okular" "${OKULAR_CONFIG_FILES[@]}"
 handle_installed_software_config "gwenview" "${GWENVIEW_CONFIG_FILES[@]}"
 handle_installed_software_config "ghostwriter" "${GHOSTWRITER_CONFIG_FILES[@]}"
@@ -470,7 +470,6 @@ check_post_installation_configs "vlc" "${VLC_CONFIG_FILES[@]}"
 check_post_installation_configs "virtualbox" "${VIRTUALBOX_CONFIG_FILES[@]}"
 check_post_installation_configs "pinta" "${PINTA_CONFIG_FILES[@]}"
 check_post_installation_configs "darktable" "${DARKTABLE_CONFIG_FILES[@]}"
-check_post_installation_configs "calibre" "${CALIBRE_CONFIG_FILES[@]}"
 check_post_installation_configs "okular" "${OKULAR_CONFIG_FILES[@]}"
 check_post_installation_configs "gwenview" "${GWENVIEW_CONFIG_FILES[@]}"
 check_post_installation_configs "ghostwriter" "${GHOSTWRITER_CONFIG_FILES[@]}"
@@ -485,7 +484,7 @@ echo "You have installed specialized software for the following categories:"
 echo "  - Audio Production (Audacity, VLC, etc.)"
 echo "  - Virtualization (VirtualBox)"
 echo "  - Graphics & Design (Pinta, Darktable, etc.)"
-echo "  - Office & Productivity (Calibre, Okular, Gwenview, Ghostwriter, etc.)"
+echo "  - Office & Productivity (Okular, Gwenview, Ghostwriter, etc.)"
 echo "  - Web & Network Tools (FileZilla, Remmina, Termius)"
 echo "  - Communication Tools (Zoom, Zoiper5, Slack)"
 echo

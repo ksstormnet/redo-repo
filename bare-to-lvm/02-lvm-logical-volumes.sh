@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# 02-lvm-logical-volumes.sh
-# This script creates and formats logical volumes for the LVM setup
+# 02-lvm-logical-volumes-enhanced.sh
+# This script creates and formats logical volumes for the LVM setup with interactive sizing
 # Run this after 01-lvm-setup.sh
 
 # Exit on any error
@@ -16,6 +16,86 @@ section() {
     echo
 }
 
+# Function to display available space and usage
+show_space_info() {
+    # Get VG size in bytes for precise calculations
+    VG_SIZE_B=$(vgs --units b vg_data --noheadings --nosuffix -o vg_size)
+    VG_FREE_B=$(vgs --units b vg_data --noheadings --nosuffix -o vg_free)
+    VG_USED_B=$(( VG_SIZE_B - VG_FREE_B ))
+    
+    # Convert to GB with 2 decimal precision
+    VG_SIZE_GB=$(echo "scale=2; $VG_SIZE_B/1024/1024/1024" | bc)
+    VG_FREE_GB=$(echo "scale=2; $VG_FREE_B/1024/1024/1024" | bc)
+    VG_USED_GB=$(echo "scale=2; $VG_USED_B/1024/1024/1024" | bc)
+    
+    # Calculate usage percentage
+    USAGE_PCT=$(echo "scale=2; ($VG_USED_B * 100) / $VG_SIZE_B" | bc)
+    
+    echo "Volume Group Space Information:"
+    echo "----------------------------------------------"
+    echo "Total Size:     ${VG_SIZE_GB} GB"
+    echo "Used Space:     ${VG_USED_GB} GB (${USAGE_PCT}%)"
+    echo "Free Space:     ${VG_FREE_GB} GB"
+    echo "----------------------------------------------"
+}
+
+# Function to create a logical volume with interactive sizing
+create_volume() {
+    local name=$1
+    local default_size=$2
+    local volume_type=$3
+    local description=$4
+    
+    echo
+    echo "======== Creating Volume: $name ========"
+    echo "Description: $description"
+    echo "Type: $volume_type"
+    echo "Default size: ${default_size}G"
+    
+    # Show current space usage
+    show_space_info
+    
+    # Prompt for custom size
+    read -r -p "Enter size in GB (or press Enter for default ${default_size}G): " size
+    size=${size:-$default_size}
+    
+    echo "Creating $name (${size}GB, $volume_type)..."
+    
+    # Create volume based on type
+    case $volume_type in
+        "raid1")
+            lvcreate --type raid1 -m1 -L "${size}G" -n "$name" vg_data
+            ;;
+        "raid0")
+            # Count available physical volumes for striping
+            pv_count=$(pvs | grep -c "vg_data")
+            
+            # Determine optimal stripe count (use at most pv_count-1 for RAID0)
+            # This ensures we don't try to stripe across more drives than available
+            if [ "$pv_count" -le 2 ]; then
+                stripe_count=1  # Not enough drives for proper striping
+                echo "WARNING: Only $pv_count drives available. Using single drive (no striping)."
+                lvcreate -L "${size}G" -n "$name" vg_data
+            else
+                # Use at most 6 drives or all available drives, whichever is less
+                # Leave one drive as buffer for safety
+                max_stripes=6
+                stripe_count=$(( pv_count > max_stripes ? max_stripes : pv_count - 1 ))
+                echo "Using $stripe_count drives for striping..."
+                lvcreate --type raid0 -i "$stripe_count" -L "${size}G" -n "$name" vg_data
+            fi
+            ;;
+        "standard")
+            lvcreate -L "${size}G" -n "$name" vg_data
+            ;;
+    esac
+    
+    echo "✓ Volume $name created"
+    
+    # Show updated space information
+    show_space_info
+}
+
 # Check if script is run as root
 if [ "$EUID" -ne 0 ]; then
     echo "Please run this script as root (use sudo)."
@@ -23,10 +103,12 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Display welcome message
-section "LVM Logical Volumes Setup"
-echo "This script will create and format logical volumes."
+section "Enhanced LVM Logical Volumes Setup"
+echo "This script will interactively create and format logical volumes."
+echo "You'll be able to specify custom sizes for each volume and monitor space usage."
 echo "Make sure you've already run 01-lvm-setup.sh before continuing."
 echo
+
 read -p "Have you run 01-lvm-setup.sh? (y/n): " -n 1 -r
 echo
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
@@ -44,9 +126,9 @@ fi
 section "Volume Group Information"
 vgdisplay vg_data
 
-# Confirm volume sizes
-section "Logical Volume Configuration"
-echo "The following logical volumes will be created:"
+# Display recommended volume configuration
+section "Recommended Logical Volume Configuration"
+echo "The following logical volumes are recommended:"
 echo
 echo "Mirror volumes for critical data:"
 echo "  - lv_home (50GB, RAID1): User profile and config files"
@@ -60,57 +142,36 @@ echo
 echo "Standard volume:"
 echo "  - lv_var (50GB): System logs and temporary files"
 echo
+echo "You'll be able to customize the size of each volume during creation."
+echo
 
-# Check if volume group has enough space
-VG_SIZE_KB=$(vgdisplay vg_data | grep "VG Size" | awk '{print $3}' | sed 's/\..*//')
-TOTAL_LV_SIZE_KB=$((200 * 1024 * 1024 + 2000 * 1024 * 1024 + 250 * 1024 * 1024 + 150 * 1024 * 1024 + 600 * 1024 * 1024 + 50 * 1024 * 1024))
+# Show initial space information
+section "Available Space"
+show_space_info
 
-if [ "$VG_SIZE_KB" -lt "$TOTAL_LV_SIZE_KB" ]; then
-    echo "WARNING: The total size of logical volumes may exceed the available space."
-    echo "Volume group size: ${VG_SIZE_KB}KB"
-    echo "Required size: ${TOTAL_LV_SIZE_KB}KB"
-    echo
-    read -p "Do you want to adjust the logical volume sizes? (y/n): " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        echo "Please edit this script and adjust the volume sizes before running it again."
-        exit 1
-    fi
-fi
-
-read -p "Do you want to proceed with creating these logical volumes? (y/n): " -n 1 -r
+read -p "Do you want to proceed with creating logical volumes? (y/n): " -n 1 -r
 echo
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     echo "Operation canceled."
     exit 1
 fi
 
-# Create logical volumes
+# Create logical volumes interactively
 section "Creating Logical Volumes"
-
-# Create mirrored volumes for critical data
-echo "Creating mirrored volumes for critical data..."
-echo "Creating lv_home (50GB, RAID1)..."
-lvcreate --type raid1 -m1 -L 50G -n lv_home vg_data
-echo "Creating lv_data (2TB, RAID1)..."
-lvcreate --type raid1 -m1 -L 2T -n lv_data vg_data
-echo "✓ Mirrored volumes created"
 
 # Create striped volumes for performance
 echo "Creating striped volumes for performance..."
-echo "Creating lv_docker (250GB, RAID0)..."
-lvcreate --type raid0 -i 3 -L 250G -n lv_docker vg_data
-echo "Creating lv_virtualbox (150GB, RAID0)..."
-lvcreate --type raid0 -i 3 -L 150G -n lv_virtualbox vg_data
-echo "Creating lv_models (600GB, RAID0)..."
-lvcreate --type raid0 -i 3 -L 600G -n lv_models vg_data
-echo "✓ Striped volumes created"
+create_volume "lv_docker" "250" "raid0" "Docker containers and images"
+create_volume "lv_virtualbox" "150" "raid0" "Virtual machine storage"
+create_volume "lv_models" "600" "raid0" "AI model storage for LLM inference"
+
+# Create mirrored volumes for critical data
+create_volume "lv_home" "50" "raid1" "User profiles and config files"
+create_volume "lv_data" "2000" "raid1" "User documents, media, and project files"
 
 # Create standard volume
 echo "Creating standard volume..."
-echo "Creating lv_var (50GB)..."
-lvcreate -L 50G -n lv_var vg_data
-echo "✓ Standard volume created"
+create_volume "lv_var" "50" "standard" "System logs and temporary files"
 
 # Display logical volume information
 section "Logical Volume Information"
@@ -119,6 +180,22 @@ echo "✓ All logical volumes created"
 
 # Format logical volumes
 section "Formatting Logical Volumes"
+echo "The following logical volumes will be formatted with ext4 filesystem:"
+echo "  - lv_home"
+echo "  - lv_docker"
+echo "  - lv_virtualbox"
+echo "  - lv_models"
+echo "  - lv_data"
+echo "  - lv_var"
+echo
+
+read -p "Do you want to proceed with formatting? (y/n): " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "Formatting skipped. You'll need to format the volumes manually."
+    exit 0
+fi
+
 echo "Formatting logical volumes with ext4 filesystem..."
 
 echo "Formatting lv_home..."
@@ -138,7 +215,6 @@ mkfs.ext4 -L data /dev/vg_data/lv_data
 
 echo "Formatting lv_var..."
 mkfs.ext4 -L var /dev/vg_data/lv_var
-
 
 echo "Setting up /var structure..."
 mkdir -p /mnt/var_temp
@@ -164,4 +240,6 @@ echo "✓ All logical volumes formatted"
 
 section "Logical Volumes Setup Complete"
 echo "Your logical volumes have been created and formatted."
+echo "Final space allocation:"
+show_space_info
 echo "You can now proceed to the next script: 03-lvm-mount-config.sh"

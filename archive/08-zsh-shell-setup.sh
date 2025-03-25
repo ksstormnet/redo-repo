@@ -309,7 +309,7 @@ section "Installing Terminal Enhancements"
 # Install modern terminal utilities
 install_packages "Terminal Utilities" \
     bat \
-    exa \
+    eza \
     fd-find \
     ripgrep \
     jq \

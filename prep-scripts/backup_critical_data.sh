@@ -73,7 +73,12 @@ find_latest_backup() {
     
     # Find the most recent critical_data_* directory
     local latest_dir
-    latest_dir=$(find "${BACKUP_DIR}" -maxdepth 1 -type d -name "critical_data_*" | sort -r | head -n 1)
+    # Store command results separately to avoid masking return values
+    local find_result
+    find_result=$(find "${BACKUP_DIR}" -maxdepth 1 -type d -name "critical_data_*") || true
+    local sorted_result
+    sorted_result=$(echo "${find_result}" | sort -r) || true
+    latest_dir=$(echo "${sorted_result}" | head -n 1) || true
     
     if [[ -z "${latest_dir}" ]]; then
         echo "No existing backup directories found in ${BACKUP_DIR}"
@@ -132,10 +137,19 @@ initialize_backup() {
     fi
 
     # Log starting information
-    log "=== Backup started at $(date) ==="
-    log "Mode: $([[ ${COMPRESS_ONLY} == true ]] && echo "Compression only" || 
-                [[ ${NO_COMPRESS} == true ]] && echo "No compression" || 
-                echo "Full backup")"
+    # Store date result separately to avoid masking return value
+    local date_result
+    date_result=$(date) || true
+    log "=== Backup started at ${date_result} ==="
+    
+    # Determine mode without command substitution in conditional
+    local mode="Full backup"
+    if [[ ${COMPRESS_ONLY} == true ]]; then
+        mode="Compression only"
+    elif [[ ${NO_COMPRESS} == true ]]; then
+        mode="No compression"
+    fi
+    log "Mode: ${mode}"
     
     return 0
 }
@@ -200,7 +214,13 @@ backup_ssh_keys() {
     fi
     
     # Fix ownership of the copied files to match the backup directory
-    if ! sudo chown -R "$(id -u):$(id -g)" "${BACKUP_PATH}/ssh_backup/" 2>>"${LOG_FILE}.err"; then
+    # Store command results in variables to avoid masking return values
+    local user_id
+    user_id=$(id -u) || true
+    local group_id
+    group_id=$(id -g) || true
+    
+    if ! sudo chown -R "${user_id}:${group_id}" "${BACKUP_PATH}/ssh_backup/" 2>>"${LOG_FILE}.err"; then
         log "Failed to fix ownership of SSH backup files"
         BACKUP_STATUS=1
         return 1
@@ -217,7 +237,13 @@ backup_ssh_keys() {
         return 1
     fi
     
-    if ! sudo chown "$(id -u):$(id -g)" "${BACKUP_PATH}/ssh_backup_temp.tar.gz" 2>>"${LOG_FILE}.err"; then
+    # Store command results in variables to avoid masking return values
+    local user_id
+    user_id=$(id -u) || true
+    local group_id
+    group_id=$(id -g) || true
+    
+    if ! sudo chown "${user_id}:${group_id}" "${BACKUP_PATH}/ssh_backup_temp.tar.gz" 2>>"${LOG_FILE}.err"; then
         log "Failed to fix ownership of SSH backup archive"
         BACKUP_STATUS=1
         return 1
@@ -690,7 +716,11 @@ compress_databases() {
     fi
     
     # Check if directory has any files
-    if [[ -z "$(ls -A "${BACKUP_PATH}/databases" 2>/dev/null)" ]]; then
+    # Store command result in a variable to avoid masking return value
+    local ls_result
+    ls_result=$(ls -A "${BACKUP_PATH}/databases" 2>/dev/null) || true
+    
+    if [[ -z "${ls_result}" ]]; then
         log "No database dumps to compress (directory empty)"
         return 0
     fi
@@ -718,12 +748,59 @@ create_metadata() {
     {
         echo "Backup Metadata - ${TIMESTAMP}"
         echo "======================="
-        echo "Operating System: $(lsb_release -ds 2>/dev/null || grep PRETTY_NAME /etc/os-release 2>/dev/null | cut -d= -f2- | tr -d '"' || echo 'Unknown')"
-        echo "Kernel Version: $(uname -r || echo 'Unknown')"
-        echo "Backup Date: $(date || echo 'Unknown')"
-        echo "Hostname: $(hostname || echo 'Unknown')"
-        echo "Backup Status: $([[ ${BACKUP_STATUS} -eq 0 ]] && echo 'Success' || echo 'Completed with errors')"
-        echo "Compression Mode: $([[ ${NO_COMPRESS} == true ]] && echo 'No compression' || [[ ${COMPRESS_ONLY} == true ]] && echo 'Compression only' || echo 'Full backup with compression')"
+        # Store command results in variables to avoid masking return values
+        local os_info="Unknown"
+        
+        # Try lsb_release first
+        if command -v lsb_release &>/dev/null; then
+            os_info=$(lsb_release -ds 2>/dev/null) || true
+        fi
+        
+        # If os_info is still empty, try /etc/os-release
+        if [[ -z "${os_info}" || "${os_info}" == "Unknown" ]]; then
+            if [[ -f /etc/os-release ]]; then
+                # Break down the pipe into separate commands to avoid masking return values
+                local pretty_name
+                pretty_name=$(grep PRETTY_NAME /etc/os-release 2>/dev/null) || true
+                if [[ -n "${pretty_name}" ]]; then
+                    local cut_result
+                    cut_result=$(echo "${pretty_name}" | cut -d= -f2-) || true
+                    if [[ -n "${cut_result}" ]]; then
+                        os_info=$(echo "${cut_result}" | tr -d '"') || true
+                    fi
+                fi
+            fi
+        fi
+        
+        local kernel_version
+        kernel_version=$(uname -r) || kernel_version="Unknown"
+        
+        local backup_date
+        backup_date=$(date) || backup_date="Unknown"
+        
+        local hostname_result
+        hostname_result=$(hostname) || hostname_result="Unknown"
+        
+        # Determine backup status
+        local status_text="Completed with errors"
+        if [[ ${BACKUP_STATUS} -eq 0 ]]; then
+            status_text="Success"
+        fi
+        
+        # Determine compression mode
+        local compression_mode="Full backup with compression"
+        if [[ ${NO_COMPRESS} == true ]]; then
+            compression_mode="No compression"
+        elif [[ ${COMPRESS_ONLY} == true ]]; then
+            compression_mode="Compression only"
+        fi
+        
+        echo "Operating System: ${os_info}"
+        echo "Kernel Version: ${kernel_version}"
+        echo "Backup Date: ${backup_date}"
+        echo "Hostname: ${hostname_result}"
+        echo "Backup Status: ${status_text}"
+        echo "Compression Mode: ${compression_mode}"
         
         echo -e "\n===== BACKUP FILE MANIFEST ====="
         [[ -f "${SSH_ARCHIVE}" ]] && echo "SSH Archive (encrypted): ${SSH_ARCHIVE}"
@@ -848,7 +925,7 @@ perform_backup() {
     backup_desktop
     
     log "All backup operations completed with status: ${BACKUP_STATUS}"
-    return ${BACKUP_STATUS}
+    return "${BACKUP_STATUS}"
 }
 
 # Main script execution
@@ -881,9 +958,9 @@ main() {
     display_status
     
     # Return final status
-    return ${BACKUP_STATUS}
+    return "${BACKUP_STATUS}"
 }
 
 # Run the script
 main "$@"
-exit ${BACKUP_STATUS}
+exit "${BACKUP_STATUS}"

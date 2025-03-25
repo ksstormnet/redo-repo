@@ -103,14 +103,14 @@ context.objects = [
 EOF
 
 # Set up RTIRQ configuration
-echo "Configuring RTIRQ..."
-if [[ -f /etc/default/rtirq ]]; then
-    sed -i 's/^RTIRQ_NAME_LIST=.*/RTIRQ_NAME_LIST="snd_usb_audio snd usb i8042"/' /etc/default/rtirq
-    sed -i 's/^RTIRQ_PRIO_HIGH=.*/RTIRQ_PRIO_HIGH=90/' /etc/default/rtirq
-    sed -i 's/^RTIRQ_PRIO_LOW=.*/RTIRQ_PRIO_LOW=75/' /etc/default/rtirq
-    systemctl enable rtirq
-    systemctl restart rtirq
-fi
+#echo "Configuring RTIRQ..."
+#if [[ -f /etc/default/rtirq ]]; then
+#    sed -i 's/^RTIRQ_NAME_LIST=.*/RTIRQ_NAME_LIST="snd_usb_audio snd usb i8042"/' /etc/default/rtirq
+#    sed -i 's/^RTIRQ_PRIO_HIGH=.*/RTIRQ_PRIO_HIGH=90/' /etc/default/rtirq
+#    sed -i 's/^RTIRQ_PRIO_LOW=.*/RTIRQ_PRIO_LOW=75/' /etc/default/rtirq
+#    systemctl enable rtirq
+#    systemctl restart rtirq
+#fi
 
 # Configure the system to disable power management for USB audio
 echo "Configuring USB power management for audio devices..."

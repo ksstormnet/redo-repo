@@ -337,7 +337,7 @@ fi
 echo "Detected router IP: ${ROUTER_IP}"
 
 # Install required packages for DNS and network discovery
-apt install -y avahi-daemon libnss-mdns nss-mdns net-tools
+apt install -y avahi-daemon libnss-mdns net-tools
 
 # Check for restored resolved.conf
 RESTORED_RESOLVED_CONF=""

@@ -23,6 +23,14 @@ else
     ACTUAL_USER="${USER}"
 fi
 
+run_as_user() {
+    if [[ -n "${SUDO_USER}" ]]; then
+        sudo -u "${SUDO_USER}" "$@"
+    else
+        "$@"
+    fi
+}
+
 # Check if we have restored configurations
 if [[ -n "${CONFIG_MAPPING_PATH}" ]] && [[ -f "${CONFIG_MAPPING_PATH}" ]]; then
     echo "Found restored configuration mapping at: ${CONFIG_MAPPING_PATH}"
@@ -39,11 +47,6 @@ fi
 VSCODE_CONFIG_FILES=(
     "${USER_HOME}/.config/Code/User/settings.json"
     "${USER_HOME}/.config/Code/User/keybindings.json"
-)
-
-ZED_CONFIG_FILES=(
-    "${USER_HOME}/.config/zed/settings.json"
-    "${USER_HOME}/.config/zed/keymap.json"
 )
 
 KATE_CONFIG_FILES=(
@@ -112,17 +115,6 @@ if [[ -n "${GENERAL_CONFIGS_PATH}" ]]; then
         RESTORED_VSCODE=false
     fi
     
-    # Check for Zed configs
-    if [[ -d "${GENERAL_CONFIGS_PATH}/config/zed" ]]; then
-        echo "Found restored Zed configuration"
-        RESTORED_ZED=true
-        RESTORED_EDITOR_CONFIGS=true
-    else
-        echo "No restored Zed configuration found"
-        RESTORED_ZED=false
-    fi
-    
-    # Check for Kate configs
     if [[ -f "${GENERAL_CONFIGS_PATH}/config/katerc" ]] || [[ -f "${GENERAL_CONFIGS_PATH}/config/kateschemarc" ]]; then
         echo "Found restored Kate configuration"
         RESTORED_KATE=true
@@ -160,7 +152,6 @@ if [[ -n "${GENERAL_CONFIGS_PATH}" ]]; then
 else
     echo "No restored configuration mapping found. Using default configurations."
     RESTORED_VSCODE=false
-    RESTORED_ZED=false
     RESTORED_KATE=false
     RESTORED_NANO=false
     RESTORED_MICRO=false
@@ -169,10 +160,6 @@ fi
 # Set up pre-installation configurations only if no restored configs found
 if [[ "${RESTORED_VSCODE}" = false ]]; then
     handle_pre_installation_config "vscode" "${VSCODE_CONFIG_FILES[@]}"
-fi
-
-if [[ "${RESTORED_ZED}" = false ]]; then
-    handle_pre_installation_config "zed" "${ZED_CONFIG_FILES[@]}"
 fi
 
 if [[ "${RESTORED_KATE}" = false ]]; then
@@ -256,39 +243,9 @@ fi
 # === STAGE 4: Zed Editor ===
 section "Installing Zed Editor"
 
-# Add the Zed Editor repository
-curl -fsSL https://zed.dev/deb/key.asc | gpg --dearmor -o /usr/share/keyrings/zed-archive-keyring.gpg || true
-echo "deb [arch=amd64 signed-by=/usr/share/keyrings/zed-archive-keyring.gpg] https://zed.dev/deb/ stable main" | tee /etc/apt/sources.list.d/zed.list > /dev/null
-apt-get update
-
-# Install Zed Editor
-install_packages "Zed Editor" zed
-
-# Create necessary directories
-mkdir -p "${USER_HOME}/.config/zed"
-
-# === STAGE 5: Restore or Set Up Zed Editor Configuration ===
-section "Setting Up Zed Editor Configuration"
-
-# Check for restored Zed configurations
-if [[ "${RESTORED_ZED}" = true ]] && [[ -d "${GENERAL_CONFIGS_PATH}/config/zed" ]]; then
-    echo "Restoring Zed configuration from backup..."
-    
-    # Create parent directory if it doesn't exist
-    mkdir -p "${USER_HOME}/.config/zed"
-    
-    # Copy all config files
-    cp -r "${GENERAL_CONFIGS_PATH}/config/zed"/* "${USER_HOME}/.config/zed/"
-    echo "✓ Restored Zed configuration"
-else
-    # Handle Zed Editor configuration files from repo
-    handle_installed_software_config "zed" "${ZED_CONFIG_FILES[@]}"
-fi
-
-# Set proper ownership for Zed configuration
-if [[ -n "${SUDO_USER}" ]]; then
-    chown -R "${SUDO_USER}":"${SUDO_USER}" "${USER_HOME}/.config/zed"
-fi
+# use the Zed install script
+curl https://zed.dev/install.sh > /tmp/install.sh
+run_as_user sh /tmp/install.sh
 
 # === STAGE 6: Additional Text Editors ===
 section "Installing Additional Text Editors"
