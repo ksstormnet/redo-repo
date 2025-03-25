@@ -12,14 +12,17 @@ set -o pipefail
 
 # Determine script directory regardless of symlinks
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PARENT_DIR="$(dirname "$SCRIPT_DIR")"
-LIB_DIR="$PARENT_DIR/lib"
+PARENT_DIR="$(dirname "${SCRIPT_DIR}")"
+LIB_DIR="${PARENT_DIR}/lib"
+
+# Default for force mode
+: "${FORCE_MODE:=false}"  # Default to not forcing reinstallation
 
 # Source the common library functions
-if [[ -f "$LIB_DIR/common.sh" ]]; then
-    source "$LIB_DIR/common.sh"
+if [[ -f "${LIB_DIR}/common.sh" ]]; then
+    source "${LIB_DIR}/common.sh"
 else
-    echo "ERROR: common.sh library not found at $LIB_DIR"
+    echo "ERROR: common.sh library not found at ${LIB_DIR}"
     exit 1
 fi
 
@@ -33,19 +36,19 @@ SCRIPT_NAME="01-audio-base"
 # Install PipeWire as the modern audio server
 function install_pipewire() {
     log_section "Installing PipeWire Audio System"
-    
+
     if check_state "${SCRIPT_NAME}_pipewire_installed"; then
         log_info "PipeWire has already been installed. Skipping..."
         return 0
     fi
-    
+
     # Update package lists
     log_step "Updating package lists"
     if ! apt_update; then
         log_error "Failed to update package lists"
         return 1
     fi
-    
+
     # Install PipeWire and related packages
     log_step "Installing PipeWire and related packages"
     local pipewire_packages=(
@@ -57,31 +60,31 @@ function install_pipewire() {
         pipewire-audio-client-libraries
         wireplumber
     )
-    
+
     if ! apt_install "${pipewire_packages[@]}"; then
         log_error "Failed to install PipeWire packages"
         return 1
     fi
-    
+
     # Mark as completed
     set_state "${SCRIPT_NAME}_pipewire_installed"
     log_success "PipeWire installed successfully"
-    
+
     return 0
 }
 
 # Configure PipeWire for low-latency audio
 function configure_pipewire() {
     log_section "Configuring PipeWire for Low-Latency Audio"
-    
+
     if check_state "${SCRIPT_NAME}_pipewire_configured"; then
         log_info "PipeWire has already been configured. Skipping..."
         return 0
     fi
-    
+
     # Create the PipeWire config directory
     mkdir -p /etc/pipewire/pipewire.conf.d
-    
+
     # Create low-latency configuration
     log_step "Creating low-latency configuration for PipeWire"
     cat > /etc/pipewire/pipewire.conf.d/10-low-latency.conf << 'EOF'
@@ -113,7 +116,7 @@ context.modules = [
     }
 ]
 EOF
-    
+
     # Create ALSA configuration to use PipeWire by default
     log_step "Configuring ALSA to use PipeWire by default"
     cat > /etc/alsa/conf.d/99-pipewire-default.conf << 'EOF'
@@ -134,30 +137,30 @@ ctl.!default {
     }
 }
 EOF
-    
+
     # Create systemd unit files to enable PipeWire for all users
     log_step "Creating systemd unit files for PipeWire"
     mkdir -p /etc/systemd/user
-    
+
     # Ensure PipeWire starts automatically for all users
     cp -f /usr/share/pipewire/pipewire.* /etc/pipewire/ 2>/dev/null || true
-    
+
     # Mark as completed
     set_state "${SCRIPT_NAME}_pipewire_configured"
     log_success "PipeWire configured for low-latency audio"
-    
+
     return 0
 }
 
 # Install JACK audio server packages
 function install_jack() {
     log_section "Installing JACK Audio Connection Kit"
-    
+
     if check_state "${SCRIPT_NAME}_jack_installed"; then
         log_info "JACK has already been installed. Skipping..."
         return 0
     fi
-    
+
     # Install JACK packages
     log_step "Installing JACK audio packages"
     local jack_packages=(
@@ -167,28 +170,28 @@ function install_jack() {
         a2jmidid
         aj-snapshot
     )
-    
+
     if ! apt_install "${jack_packages[@]}"; then
         log_error "Failed to install JACK packages"
         return 1
     fi
-    
+
     # Mark as completed
     set_state "${SCRIPT_NAME}_jack_installed"
     log_success "JACK audio server installed successfully"
-    
+
     return 0
 }
 
 # Install essential audio utilities
 function install_audio_utilities() {
     log_section "Installing Essential Audio Utilities"
-    
+
     if check_state "${SCRIPT_NAME}_audio_utilities_installed"; then
         log_info "Audio utilities have already been installed. Skipping..."
         return 0
     fi
-    
+
     # Install essential audio utilities
     log_step "Installing audio utilities"
     local audio_utils=(
@@ -204,16 +207,16 @@ function install_audio_utilities() {
         calf-plugins
         zam-plugins
     )
-    
+
     if ! apt_install "${audio_utils[@]}"; then
         log_warning "Failed to install some audio utilities"
         # Continue anyway since some packages might not be available
     fi
-    
+
     # Mark as completed
     set_state "${SCRIPT_NAME}_audio_utilities_installed"
     log_success "Essential audio utilities installed successfully"
-    
+
     return 0
 }
 
@@ -224,31 +227,31 @@ function install_audio_utilities() {
 # Configure user permissions for audio
 function configure_audio_permissions() {
     log_section "Configuring Audio Permissions"
-    
+
     if check_state "${SCRIPT_NAME}_audio_permissions_configured"; then
         log_info "Audio permissions have already been configured. Skipping..."
         return 0
     fi
-    
+
     # Add user to audio group
     log_step "Adding users to audio group"
-    
+
     # Get the user who will use the audio system
     local audio_user
-    if [[ -n "$SUDO_USER" ]]; then
-        audio_user="$SUDO_USER"
+    if [[ -n "${SUDO_USER}" ]]; then
+        audio_user="${SUDO_USER}"
     else
         # Default to 'ubuntu' if running as root directly
         audio_user=$(grep -E "^[^:]+:[^:]+:1000:" /etc/passwd | cut -d: -f1) || "ubuntu"
     fi
-    
-    log_info "Adding user $audio_user to audio and video groups"
-    usermod -a -G audio "$audio_user"
-    usermod -a -G video "$audio_user" # Often needed for hardware acceleration
-    
+
+    log_info "Adding user ${audio_user} to audio and video groups"
+    usermod -a -G audio "${audio_user}"
+    usermod -a -G video "${audio_user}" # Often needed for hardware acceleration
+
     # Configure real-time permissions
     log_step "Configuring real-time permissions for audio group"
-    
+
     # Check if limits file already exists
     if [[ ! -f /etc/security/limits.d/audio.conf ]]; then
         cat > /etc/security/limits.d/audio.conf << 'EOF'
@@ -261,26 +264,26 @@ EOF
     else
         log_info "Audio limits configuration already exists"
     fi
-    
+
     # Mark as completed
     set_state "${SCRIPT_NAME}_audio_permissions_configured"
     log_success "Audio permissions configured successfully"
-    
+
     return 0
 }
 
 # Configure default audio settings
 function configure_default_audio() {
     log_section "Configuring Default Audio Settings"
-    
+
     if check_state "${SCRIPT_NAME}_default_audio_configured"; then
         log_info "Default audio settings have already been configured. Skipping..."
         return 0
     fi
-    
+
     # Set default ALSA configuration
     log_step "Setting default ALSA configuration"
-    
+
     # Create asoundrc template for users
     mkdir -p /etc/skel
     cat > /etc/skel/.asoundrc << 'EOF'
@@ -295,24 +298,24 @@ ctl.!default {
     hint.description "Default Audio Control (PipeWire)"
 }
 EOF
-    
+
     # Copy to existing user homes (only if it doesn't exist)
     for user_home in /home/*; do
-        if [[ -d "$user_home" && ! -f "$user_home/.asoundrc" ]]; then
-            log_info "Creating .asoundrc for user $(basename "$user_home")"
-            cp /etc/skel/.asoundrc "$user_home/"
-            chown "$(basename "$user_home")": "$user_home/.asoundrc"
+        if [[ -d "${user_home}" && ! -f "${user_home}/.asoundrc" ]]; then
+            log_info "Creating .asoundrc for user $(basename "${user_home}")"
+            cp /etc/skel/.asoundrc "${user_home}/"
+            chown "$(basename "${user_home}")": "${user_home}/.asoundrc"
         fi
     done
-    
+
     # Also configure root if needed
     if [[ ! -f /root/.asoundrc ]]; then
         cp /etc/skel/.asoundrc /root/
     fi
-    
+
     # Create QjackCtl configuration directory
     log_step "Creating QjackCtl configuration"
-    
+
     # For user template
     mkdir -p /etc/skel/.config/rncbc.org
     cat > /etc/skel/.config/rncbc.org/QjackCtl.conf << 'EOF'
@@ -343,26 +346,26 @@ ServerSuffix=
 StartJack=true
 StopJack=true
 EOF
-    
+
     # Apply settings to existing users
     for user_home in /home/*; do
-        if [[ -d "$user_home" ]]; then
-            user=$(basename "$user_home")
-            user_config_dir="$user_home/.config/rncbc.org"
-            
-            if [[ ! -d "$user_config_dir" ]]; then
-                log_info "Creating QjackCtl configuration for user $user"
-                mkdir -p "$user_config_dir"
-                cp /etc/skel/.config/rncbc.org/QjackCtl.conf "$user_config_dir/"
-                chown -R "$user": "$user_config_dir"
+        if [[ -d "${user_home}" ]]; then
+            user=$(basename "${user_home}")
+            user_config_dir="${user_home}/.config/rncbc.org"
+
+            if [[ ! -d "${user_config_dir}" ]]; then
+                log_info "Creating QjackCtl configuration for user ${user}"
+                mkdir -p "${user_config_dir}"
+                cp /etc/skel/.config/rncbc.org/QjackCtl.conf "${user_config_dir}/"
+                chown -R "${user}": "${user_config_dir}"
             fi
         fi
     done
-    
+
     # Mark as completed
     set_state "${SCRIPT_NAME}_default_audio_configured"
     log_success "Default audio settings configured successfully"
-    
+
     return 0
 }
 
@@ -372,53 +375,53 @@ EOF
 
 function setup_audio_base() {
     log_section "Setting Up Audio Base System"
-    
+
     # Exit if this script has already been completed successfully
     if check_state "${SCRIPT_NAME}_completed" && [[ "${FORCE_MODE}" != "true" ]]; then
         log_info "Audio base system has already been set up. Skipping..."
         return 0
     fi
-    
+
     # Install PipeWire
     if ! install_pipewire; then
         log_error "Failed to install PipeWire"
         return 1
     fi
-    
+
     # Configure PipeWire
     if ! configure_pipewire; then
         log_warning "Failed to configure PipeWire"
         # Continue anyway
     fi
-    
+
     # Install JACK
     if ! install_jack; then
         log_warning "Failed to install JACK"
         # Continue anyway as PipeWire provides JACK API
     fi
-    
+
     # Install audio utilities
     if ! install_audio_utilities; then
         log_warning "Failed to install some audio utilities"
         # Continue anyway
     fi
-    
+
     # Configure audio permissions
     if ! configure_audio_permissions; then
         log_warning "Failed to configure audio permissions"
         # Continue anyway
     fi
-    
+
     # Configure default audio settings
     if ! configure_default_audio; then
         log_warning "Failed to configure default audio settings"
         # Continue anyway
     fi
-    
+
     # Mark the entire script as completed
     set_state "${SCRIPT_NAME}_completed"
     log_success "Audio base system setup completed successfully"
-    
+
     return 0
 }
 

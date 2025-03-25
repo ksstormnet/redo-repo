@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC1091,SC2154,SC2310,SC2311,SC2312
 
 # lvm-chroot.sh
 # Version: 1.0
@@ -9,6 +10,7 @@
 
 # Exit on any error
 set -e
+shopt -s inherit_errexit
 
 # Text formatting
 BOLD='\033[1m'
@@ -49,7 +51,9 @@ cleanup() {
     umount -l "/mnt/sys" 2>/dev/null || true
     umount -l "/mnt/run" 2>/dev/null || true
     umount -l "/mnt/boot/efi" 2>/dev/null || true
-    [[ -n "$USB_DEVICE" ]] && umount -l "/mnt/media/usb" 2>/dev/null || true
+    if [[ -n "${USB_DEVICE}" ]]; then
+        umount -l "/mnt/media/usb" 2>/dev/null || true
+    fi
     umount -l "/mnt" 2>/dev/null || true
 }
 
@@ -59,19 +63,19 @@ trap cleanup EXIT
 confirm() {
     local prompt="$1"
     local default="$2"
-    
-    if [[ "$default" = "Y" ]]; then
+
+    if [[ "${default}" = "Y" ]]; then
         local options="[Y/n]"
         local default_value="Y"
     else
         local options="[y/N]"
         local default_value="N"
     fi
-    
-    read -p "$prompt $options: " -r REPLY
-    REPLY=${REPLY:-$default_value}
-    
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+
+    read -p "${prompt} ${options}: " -r REPLY
+    REPLY=${REPLY:-${default_value}}
+
+    if [[ ${REPLY} =~ ^[Yy]$ ]]; then
         return 0
     else
         return 1
@@ -79,7 +83,7 @@ confirm() {
 }
 
 # Check if script is run as root
-if [[ "$EUID" -ne 0 ]]; then
+if [[ "${EUID}" -ne 0 ]]; then
     error "Please run this script as root (use sudo)."
 fi
 
@@ -95,24 +99,24 @@ echo
 
 # Ask for the root partition
 read -r -p "Enter the root partition device (e.g., /dev/sda2): " ROOT_DEVICE
-if [[ -z "$ROOT_DEVICE" ]]; then
+if [[ -z "${ROOT_DEVICE}" ]]; then
     error "Root partition device cannot be empty."
 fi
 
 # Ask for the EFI partition
 read -r -p "Enter the EFI partition device (e.g., /dev/sda1): " EFI_DEVICE
-if [[ -z "$EFI_DEVICE" ]]; then
+if [[ -z "${EFI_DEVICE}" ]]; then
     error "EFI partition device cannot be empty."
 fi
 
 # Ask for the USB drive partition
 read -r -p "Enter the USB drive device containing scripts (e.g., /dev/sdd1): " USB_DEVICE
-if [[ -z "$USB_DEVICE" ]]; then
+if [[ -z "${USB_DEVICE}" ]]; then
     warning "USB drive device not specified. USB drive won't be mounted in chroot."
     USB_DEVICE=""
 else
-    if [[ ! -b "$USB_DEVICE" ]]; then
-        warning "Device $USB_DEVICE does not exist or is not a block device."
+    if [[ ! -b "${USB_DEVICE}" ]]; then
+        warning "Device ${USB_DEVICE} does not exist or is not a block device."
         if ! confirm "Continue anyway?" "N"; then
             error "Operation canceled."
         fi
@@ -127,7 +131,8 @@ fi
 
 # Verify the required volumes exist
 section "Verifying LVM Volumes"
-if ! lvs | grep -q vg_data; then
+LVS_OUTPUT=$(lvs || true)
+if ! echo "${LVS_OUTPUT}" | grep -q vg_data; then
     error "No logical volumes found in vg_data. Run lvm-setup.sh first."
 fi
 
@@ -135,15 +140,15 @@ required_volumes=("lv_data" "lv_home" "lv_docker" "lv_virtualbox" "lv_models")
 missing_volumes=0
 
 for vol in "${required_volumes[@]}"; do
-    if ! lvs | grep -q "$vol"; then
-        warning "Required volume $vol not found."
+    if ! echo "${LVS_OUTPUT}" | grep -q "${vol}"; then
+        warning "Required volume ${vol} not found."
         missing_volumes=$((missing_volumes + 1))
     else
-        success "Volume $vol exists"
+        success "Volume ${vol} exists"
     fi
 done
 
-if [[ $missing_volumes -gt 0 ]]; then
+if [[ ${missing_volumes} -gt 0 ]]; then
     if ! confirm "Some required volumes are missing. Continue anyway?" "N"; then
         error "Please create all required logical volumes first."
     fi
@@ -155,7 +160,7 @@ echo "Creating mount point /mnt if it doesn't exist..."
 mkdir -p /mnt
 
 echo "Mounting root volume to /mnt..."
-if ! mount "$ROOT_DEVICE" /mnt; then
+if ! mount "${ROOT_DEVICE}" /mnt; then
     error "Failed to mount root volume to /mnt."
 fi
 success "Root volume mounted to /mnt"
@@ -165,19 +170,19 @@ echo "Creating EFI mount point if it doesn't exist..."
 mkdir -p /mnt/boot/efi
 
 echo "Mounting EFI partition to /mnt/boot/efi..."
-if ! mount "$EFI_DEVICE" /mnt/boot/efi; then
+if ! mount "${EFI_DEVICE}" /mnt/boot/efi; then
     warning "Failed to mount EFI partition. You may need to do this manually."
 else
     success "EFI partition mounted to /mnt/boot/efi"
 fi
 
 # Mount USB drive if specified
-if [[ -n "$USB_DEVICE" ]]; then
+if [[ -n "${USB_DEVICE}" ]]; then
     echo "Creating USB mount point if it doesn't exist..."
     mkdir -p /mnt/media/usb
 
     echo "Mounting USB drive to /mnt/media/usb..."
-    if ! mount "$USB_DEVICE" /mnt/media/usb; then
+    if ! mount "${USB_DEVICE}" /mnt/media/usb; then
         warning "Failed to mount USB drive. Scripts won't be accessible in chroot."
     else
         success "USB drive mounted to /mnt/media/usb"
@@ -187,11 +192,11 @@ fi
 # Bind mount essential filesystems
 echo "Binding essential filesystems for chroot..."
 for fs in /dev /dev/pts /proc /sys /run; do
-    mkdir -p "/mnt$fs"
-    if ! mount --bind "$fs" "/mnt$fs"; then
-        warning "Failed to bind mount $fs, trying to continue..."
+    mkdir -p "/mnt${fs}"
+    if ! mount --bind "${fs}" "/mnt${fs}"; then
+        warning "Failed to bind mount ${fs}, trying to continue..."
     else
-        success "Bind mounted $fs"
+        success "Bind mounted ${fs}"
     fi
 done
 

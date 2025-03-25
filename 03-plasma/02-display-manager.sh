@@ -30,6 +30,14 @@ SCRIPT_NAME="02-display-manager"
 ENABLE_AUTOLOGIN=false
 AUTOLOGIN_USER=""
 
+# Default for interactive mode and force mode
+: "${INTERACTIVE:=true}"  # Default to interactive mode
+: "${FORCE_MODE:=false}"  # Default to not forcing reinstallation
+
+# State directory for tracking progress
+: "${STATE_DIR:=/var/lib/system-setup/state}"
+mkdir -p "${STATE_DIR}" 2>/dev/null || true
+
 # ============================================================================
 # Command Line Argument Processing
 # ============================================================================
@@ -65,7 +73,7 @@ function parse_args() {
                 ;;
         esac
     done
-    
+
     # Log selected options
     if [[ "${ENABLE_AUTOLOGIN}" == "true" ]]; then
         log_info "Automatic login will be enabled for user: ${AUTOLOGIN_USER}"
@@ -79,19 +87,19 @@ function parse_args() {
 # Install SDDM display manager
 function install_sddm() {
     log_section "Installing SDDM Display Manager"
-    
+
     if check_state "${SCRIPT_NAME}_sddm_installed"; then
         log_info "SDDM already installed. Skipping..."
         return 0
     fi
-    
+
     # Update package lists
     log_step "Updating package lists"
     if ! apt_update; then
         log_error "Failed to update package lists"
         return 1
     fi
-    
+
     # Install SDDM and related packages
     log_step "Installing SDDM packages"
     local sddm_packages=(
@@ -99,32 +107,32 @@ function install_sddm() {
         sddm-theme-breeze
         kde-config-sddm
     )
-    
+
     if ! apt_install "${sddm_packages[@]}"; then
         log_error "Failed to install SDDM packages"
         return 1
     fi
-    
+
     # Mark as completed
     set_state "${SCRIPT_NAME}_sddm_installed"
     log_success "SDDM display manager installed successfully"
-    
+
     return 0
 }
 
 # Configure SDDM display manager
 function configure_sddm() {
     log_section "Configuring SDDM Display Manager"
-    
+
     if check_state "${SCRIPT_NAME}_sddm_configured"; then
         log_info "SDDM already configured. Skipping..."
         return 0
     fi
-    
+
     # Create SDDM configuration directory if it doesn't exist
     log_step "Creating SDDM configuration directory"
     mkdir -p /etc/sddm.conf.d
-    
+
     # Create main SDDM configuration file
     log_step "Creating SDDM configuration file"
     cat > /etc/sddm.conf.d/00-kde-studio.conf << EOF
@@ -149,11 +157,11 @@ HaltCommand=/usr/bin/systemctl poweroff
 RebootCommand=/usr/bin/systemctl reboot
 Numlock=on
 EOF
-    
+
     # Configure autologin if requested
     if [[ "${ENABLE_AUTOLOGIN}" == "true" && -n "${AUTOLOGIN_USER}" ]]; then
         log_step "Configuring automatic login for user: ${AUTOLOGIN_USER}"
-        
+
         # Verify user exists
         if id "${AUTOLOGIN_USER}" &>/dev/null; then
             # Create autologin configuration
@@ -168,10 +176,10 @@ EOF
             log_warning "User ${AUTOLOGIN_USER} does not exist. Skipping autologin configuration."
         fi
     fi
-    
+
     # Set SDDM as default display manager
     log_step "Setting SDDM as default display manager"
-    
+
     # Check if we have any other display managers installed
     local other_dm_installed=false
     for dm in gdm3 lightdm xdm; do
@@ -180,15 +188,15 @@ EOF
             break
         fi
     done
-    
+
     # If another display manager is installed, use debconf to set SDDM as default
     if [[ "${other_dm_installed}" == "true" ]]; then
         log_info "Other display managers detected. Using debconf to set SDDM as default."
-        
+
         # Use debconf to set SDDM as default
         echo "/usr/bin/sddm" > /etc/X11/default-display-manager
         echo "sddm shared/default-x-display-manager select sddm" | debconf-set-selections
-        
+
         # Reconfigure display manager packages
         for dm in sddm gdm3 lightdm xdm; do
             if dpkg -l | grep -q "^ii  ${dm} "; then
@@ -200,15 +208,15 @@ EOF
         # Just set SDDM as default directly
         echo "/usr/bin/sddm" > /etc/X11/default-display-manager
     fi
-    
+
     # Enable SDDM service
     log_info "Enabling SDDM service"
     systemctl enable sddm
-    
+
     # Mark as completed
     set_state "${SCRIPT_NAME}_sddm_configured"
     log_success "SDDM display manager configured successfully"
-    
+
     return 0
 }
 
@@ -219,24 +227,24 @@ EOF
 # Configure SDDM theme
 function configure_sddm_theme() {
     log_section "Configuring SDDM Theme"
-    
+
     if check_state "${SCRIPT_NAME}_theme_configured"; then
         log_info "SDDM theme already configured. Skipping..."
         return 0
     fi
-    
+
     # Ensure the Breeze theme is installed
     log_step "Ensuring Breeze theme is installed"
     if ! apt_install sddm-theme-breeze; then
         log_warning "Failed to install Breeze theme for SDDM"
         # Continue anyway as the default theme might still work
     fi
-    
+
     # Create avatar icons directory for users
     log_step "Setting up avatar icons for users"
     local faces_dir="/usr/share/sddm/faces"
     mkdir -p "${faces_dir}"
-    
+
     # Find all local users with home directories
     local users=()
     while IFS=: read -r username _ userid _ _ homedir _; do
@@ -244,7 +252,7 @@ function configure_sddm_theme() {
             users+=("${username}")
         fi
     done < /etc/passwd
-    
+
     # Create default avatar symlinks for users
     for user in "${users[@]}"; do
         if [[ ! -f "${faces_dir}/${user}.face.icon" ]]; then
@@ -252,7 +260,7 @@ function configure_sddm_theme() {
             ln -sf "/usr/share/sddm/faces/.face.icon" "${faces_dir}/${user}.face.icon"
         fi
     done
-    
+
     # Copy default avatar icon if it doesn't exist
     if [[ ! -f "${faces_dir}/.face.icon" ]]; then
         # Try to find a default avatar from various locations
@@ -263,7 +271,7 @@ function configure_sddm_theme() {
                 break
             fi
         done
-        
+
         if [[ -n "${default_avatar}" ]]; then
             log_info "Copying default avatar from: ${default_avatar}"
             cp "${default_avatar}" "${faces_dir}/.face.icon"
@@ -271,11 +279,11 @@ function configure_sddm_theme() {
             log_warning "Could not find a default avatar icon"
         fi
     fi
-    
+
     # Mark as completed
     set_state "${SCRIPT_NAME}_theme_configured"
     log_success "SDDM theme configured successfully"
-    
+
     return 0
 }
 
@@ -285,35 +293,35 @@ function configure_sddm_theme() {
 
 function setup_display_manager() {
     log_section "Setting Up Display Manager"
-    
+
     # Exit if this script has already been completed successfully
     if check_state "${SCRIPT_NAME}_completed" && [[ "${FORCE_MODE}" != "true" ]]; then
         log_info "Display manager has already been set up. Skipping..."
         return 0
     fi
-    
+
     # Install SDDM
     if ! install_sddm; then
         log_error "Failed to install SDDM display manager"
         return 1
     fi
-    
+
     # Configure SDDM
     if ! configure_sddm; then
         log_warning "Failed to configure SDDM display manager"
         # Continue anyway as basic functionality should still work
     fi
-    
+
     # Configure SDDM theme
     if ! configure_sddm_theme; then
         log_warning "Failed to configure SDDM theme"
         # Continue anyway as this is not critical
     fi
-    
+
     # Mark as completed
     set_state "${SCRIPT_NAME}_completed"
     log_success "Display manager setup completed successfully"
-    
+
     return 0
 }
 

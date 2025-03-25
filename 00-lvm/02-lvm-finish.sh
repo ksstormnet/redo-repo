@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC1091,SC2154,SC2310,SC2311,SC2312,SC2317
 
 # lvm-finish.sh
 # Version: 1.0
@@ -10,6 +11,7 @@
 
 # Exit on any error
 set -e
+shopt -s inherit_errexit
 
 # Text formatting
 BOLD='\033[1m'
@@ -44,7 +46,7 @@ error() {
 # Set up trap for cleanup
 cleanup() {
     # Nothing specific to clean up in this script
-    :
+    echo "Cleanup complete"
 }
 
 trap cleanup EXIT
@@ -52,19 +54,19 @@ trap cleanup EXIT
 confirm() {
     local prompt="$1"
     local default="$2"
-    
-    if [[ "$default" = "Y" ]]; then
+
+    if [[ "${default}" = "Y" ]]; then
         local options="[Y/n]"
         local default_value="Y"
     else
         local options="[y/N]"
         local default_value="N"
     fi
-    
-    read -p "$prompt $options: " -r REPLY
-    REPLY=${REPLY:-$default_value}
-    
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+
+    read -p "${prompt} ${options}: " -r REPLY
+    REPLY=${REPLY:-${default_value}}
+
+    if [[ ${REPLY} =~ ^[Yy]$ ]]; then
         return 0
     else
         return 1
@@ -72,7 +74,7 @@ confirm() {
 }
 
 # Check if script is run as root
-if [[ "$EUID" -ne 0 ]]; then
+if [[ "${EUID}" -ne 0 ]]; then
     error "Please run this script as root (use sudo)."
 fi
 
@@ -94,7 +96,8 @@ required_mounts=("/home/scott" "/docker" "/data" "/data/virtualbox" "/opt/models
 missing_mounts=0
 
 for mount_point in "${required_mounts[@]}"; do
-    if ! mount | grep -q " ${mount_point} "; then
+    MOUNT_OUTPUT=$(mount || true)
+    if ! echo "${MOUNT_OUTPUT}" | grep -q " ${mount_point} "; then
         warning "The ${mount_point} volume is not mounted."
         missing_mounts=$((missing_mounts + 1))
     else
@@ -102,8 +105,8 @@ for mount_point in "${required_mounts[@]}"; do
     fi
 done
 
-if [[ $missing_mounts -gt 0 ]]; then
-    warning "$missing_mounts mount points are missing."
+if [[ ${missing_mounts} -gt 0 ]]; then
+    warning "${missing_mounts} mount points are missing."
     if ! confirm "Do you want to try mounting all volumes from fstab?" "Y"; then
         error "Cannot continue without all volumes mounted."
     else
@@ -213,14 +216,14 @@ fi
 create_symlink() {
     local source="$1"
     local target="$2"
-    
-    if [[ -e "$target" && ! -L "$target" ]]; then
-        warning "Target $target exists and is not a symlink. Moving to ${target}.bak"
-        mv "$target" "${target}.bak"
+
+    if [[ -e "${target}" && ! -L "${target}" ]]; then
+        warning "Target ${target} exists and is not a symlink. Moving to ${target}.bak"
+        mv "${target}" "${target}.bak"
     fi
-    
-    if ! ln -sf "$source" "$target"; then
-        warning "Failed to create symlink from $source to $target"
+
+    if ! ln -sf "${source}" "${target}"; then
+        warning "Failed to create symlink from ${source} to ${target}"
         return 1
     fi
     return 0
@@ -254,14 +257,15 @@ if [[ ! -L "/var/lib/docker" ]]; then
     if [[ -d "/var/lib/docker" ]]; then
         # If it's a directory, move its contents to /docker
         echo "Moving existing Docker data to /docker..."
-        if [[ "$(ls -A /var/lib/docker 2>/dev/null)" ]]; then
+        DOCKER_FILES=$(ls -A /var/lib/docker 2>/dev/null || true)
+        if [[ -n "${DOCKER_FILES}" ]]; then
             cp -a /var/lib/docker/. /docker/
             rm -rf /var/lib/docker
         else
             rmdir /var/lib/docker
         fi
     fi
-    
+
     # Create the symlink
     if ! ln -sf /docker /var/lib/docker; then
         warning "Failed to create Docker symlink"
@@ -275,26 +279,26 @@ fi
 # If Docker is installed, configure and restart it
 if command -v docker &>/dev/null; then
     echo "Docker is installed. Configuring it to use the new location..."
-    
+
     # Check if Docker service is running
     if systemctl is-active --quiet docker; then
         systemctl stop docker
     fi
-    
+
     # Create or update Docker daemon config
     mkdir -p /etc/docker
-    
+
     if [[ -f /etc/docker/daemon.json ]]; then
         # Backup existing config
         cp /etc/docker/daemon.json /etc/docker/daemon.json.bak
-        
-        # Update data-root if it exists, otherwise add it
-        if grep -q "data-root" /etc/docker/daemon.json; then
-            sed -i 's|"data-root": ".*"|"data-root": "/docker"|g' /etc/docker/daemon.json
-        else
-            # Simple JSON manipulation to add data-root
-            sed -i '1s/{/{\'$'\n  "data-root": "\/docker",/' /etc/docker/daemon.json
-        fi
+
+            # Update data-root if it exists, otherwise add it
+            if grep -q "data-root" /etc/docker/daemon.json; then
+                sed -i 's|"data-root": ".*"|"data-root": "/docker"|g' /etc/docker/daemon.json
+            else
+                # Simple JSON manipulation to add data-root with proper escaping
+                sed -i '1s/{"data-root": "\/docker",}' /etc/docker/daemon.json
+            fi
     else
         # Create new config file
         echo '{
@@ -302,7 +306,7 @@ if command -v docker &>/dev/null; then
   "storage-driver": "overlay2"
 }' > /etc/docker/daemon.json
     fi
-    
+
     # Start Docker service
     systemctl start docker
     success "Docker configured to use /docker"
@@ -316,7 +320,7 @@ echo "Configuring VirtualBox to use /data/virtualbox..."
 
 if command -v vboxmanage &>/dev/null; then
     echo "VirtualBox is installed. Configuring default machine folder..."
-    
+
     # Set the default machine folder for all users
     if ! sudo -u scott vboxmanage setproperty machinefolder /data/virtualbox; then
         warning "Failed to set VirtualBox machine folder. You may need to do this manually."
@@ -333,21 +337,29 @@ echo "Performing final system verification..."
 
 # Check mount points
 echo "Checking mount points..."
-mount | grep "vg_data"
+MOUNT_OUTPUT=$(mount || true)
+echo "${MOUNT_OUTPUT}" | grep "vg_data" || echo "No vg_data mounts found!"
 
 # Check symlinks
 echo "Checking symlinks..."
-ls -la /home/scott | grep -E "Documents|Development|Music|Pictures|Video|Archive|repo"
-ls -la /var/lib | grep docker
-ls -la / | grep repo
+# Using find instead of ls | grep
+echo "Symlinks in /home/scott:"
+find /home/scott -maxdepth 1 -type l \( -name "Documents" -o -name "Development" -o -name "Music" -o -name "Pictures" -o -name "Video" -o -name "Archive" -o -name "repo" \) -ls 2>/dev/null || echo "No matching symlinks found"
+
+echo "Docker symlink:"
+find /var/lib -maxdepth 1 -type l -name "docker" -ls 2>/dev/null || echo "Docker symlink not found"
+
+echo "Repo symlink:"
+find / -maxdepth 1 -type l -name "repo" -ls 2>/dev/null || echo "Repo symlink not found"
 
 # Check directory structure
 echo "Checking directory structure..."
-ls -la /data
+ls -la /data || echo "Cannot access /data"
 
 # Display disk usage
 echo "Disk usage:"
-df -h | grep -E "Filesystem|vg_data"
+DF_OUTPUT=$(df -h || true)
+echo "${DF_OUTPUT}" | grep -E "Filesystem|vg_data" || echo "No vg_data filesystems found!"
 
 section "Setup Complete"
 echo "The LVM setup is now complete! Your system is configured with:"
