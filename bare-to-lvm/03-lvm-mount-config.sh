@@ -45,7 +45,7 @@ error() {
     echo -e "${RED}✗ ERROR: $1${NC}"
     exit 1
 }
-01-lvm-setup-enhanced
+
 # Function to confirm actions
 confirm() {
     local prompt="$1"
@@ -76,7 +76,7 @@ command_exists() {
 
 # Function to check if a volume exists
 volume_exists() {
-    lvs | grep -q "vg_data/$1"
+    lvs --noheadings -o lv_name,vg_name | grep -q "\s*$1\s*vg_data"
 }
 
 # Check if script is run as root

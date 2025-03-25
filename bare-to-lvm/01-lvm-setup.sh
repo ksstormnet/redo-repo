@@ -77,7 +77,7 @@ echo "It will dynamically detect and use all available NVMe drives."
 echo "Make sure you've already run 00-lvm-prepare.sh before continuing."
 echo
 
-read -p "Have you run 00-lvm-prepare.sh? (y/n): " -n 1 -r
+read -r -p "Have you run 00-lvm-prepare.sh? (y/n): " -n 1
 echo
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     warning "Please run 00-lvm-prepare.sh first."
@@ -91,7 +91,7 @@ echo "This will open the console setup utility where you can select a larger fon
 echo "Recommended: Select 'UTF-8', then 'Terminus', then a larger size like '16x32'."
 echo
 
-read -p "Configure console font now? (y/n): " -n 1 -r
+read -r -p "Configure console font now? (y/n): " -n 1
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     if ! dpkg-reconfigure console-setup; then
@@ -130,8 +130,12 @@ fi
 
 # Scan for NVMe drives
 section "Scanning for NVMe Drives"
-NVME_DRIVES=$(ls /dev/nvme*n1 2>/dev/null || echo "")
-if [ -z "$NVME_DRIVES" ]; then
+# Use mapfile to safely populate the array
+if ! mapfile -t NVME_DRIVES < <(ls /dev/nvme*n1 2>/dev/null); then
+    NVME_DRIVES=()
+fi
+
+if [ ${#NVME_DRIVES[@]} -eq 0 ]; then
     error "No NVMe drives found. Please check your hardware."
     exit 1
 fi
@@ -141,7 +145,7 @@ DRIVE_COUNT=0
 TOTAL_RAW_CAPACITY=0
 
 echo "Found the following NVMe drives for LVM setup:"
-for drive in $NVME_DRIVES; do
+for drive in "${NVME_DRIVES[@]}"; do
     # Get drive size in bytes
     if ! DRIVE_SIZE=$(blockdev --getsize64 "$drive" 2>/dev/null); then
         warning "Could not get size for $drive"
@@ -163,7 +167,7 @@ echo "Total drives: $DRIVE_COUNT"
 echo "Combined raw capacity: $TOTAL_HUMAN_CAPACITY"
 echo
 
-read -p "Are these the correct drives for your LVM setup? (y/n): " -n 1 -r
+read -r -p "Are these the correct drives for your LVM setup? (y/n): " -n 1
 echo
 if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     warning "Operation canceled. Please adjust the script to match your drive configuration."
@@ -175,7 +179,7 @@ section "Creating Physical Volumes"
 echo "Creating physical volumes on NVMe drives..."
 
 PV_SUCCESS=0
-for drive in $NVME_DRIVES; do
+for drive in "${NVME_DRIVES[@]}"; do
     echo "Creating physical volume on $drive..."
     if ! pvcreate "$drive" -ff; then
         warning "Failed to create physical volume on $drive. Will continue with other drives."
@@ -209,8 +213,8 @@ echo "Creating volume group 'vg_data' combining all NVMe drives..."
 echo "Waiting for system to settle..."
 sleep 5
 
-# Create volume group using the NVME_DRIVES variable instead of hardcoded paths
-if ! vgcreate vg_data "$NVME_DRIVES" -ff; then
+# Create volume group using the NVME_DRIVES array
+if ! vgcreate vg_data "${NVME_DRIVES[@]}" -ff; then
     error "Failed to create volume group 'vg_data'"
     exit 1
 fi
