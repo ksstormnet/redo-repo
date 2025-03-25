@@ -4,3 +4,49 @@
 # Ignore lost+found directory
 lost+found/
 
+# Shell script specific ignores
+*.log
+*.bak
+*.tmp
+*~
+*.swp
+*.swo
+
+# Backup files
+*.orig
+*.rej
+
+# Compiled files
+*.o
+*.so
+*.a
+*.dll
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.sublime-*
+.DS_Store
+Thumbs.db
+
+# Runtime data
+*.pid
+*.seed
+.lock
+.env
+.env.*
+!.env.example
+
+# Distribution / packaging
+dist/
+build/
+*.tar.gz
+*.zip
+
+# Logs and databases
+*.sqlite
+wget-log*
+
+# Temporary directories
+tmp/
+temp/

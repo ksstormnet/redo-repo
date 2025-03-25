@@ -6,7 +6,7 @@
 # Sets up low-latency audio, real-time priorities, and system optimizations
 # necessary for professional audio work
 # ============================================================================
-
+exit 0
 # shellcheck disable=SC1091,SC2154,SC2250
 
 # Exit on error, but handle errors gracefully
@@ -34,13 +34,13 @@ SCRIPT_NAME="02-real-time-audio"
 
 function configure_pipewire_low_latency() {
     log_step "Configuring PipeWire for Low Latency Audio"
-    
+
     # Skip if already completed
     if check_state "${SCRIPT_NAME}_pipewire_configured"; then
         log_info "PipeWire already configured for low latency. Skipping..."
         return 0
     fi
-    
+
     # Ensure PipeWire is installed
     if ! command -v pipewire &> /dev/null; then
         log_warning "PipeWire not found. Installing PipeWire..."
@@ -49,7 +49,7 @@ function configure_pipewire_low_latency() {
             return 1
         fi
     fi
-    
+
     # Get user's home directory
     local user_home
     if [[ -n "${SUDO_USER}" ]]; then
@@ -57,19 +57,19 @@ function configure_pipewire_low_latency() {
     else
         user_home="${HOME}"
     fi
-    
+
     # Create the pipewire config directory if it doesn't exist
     local config_dir="${user_home}/.config/pipewire"
     mkdir -p "${config_dir}"
-    
+
     # Create low latency config file
     local conf_file="${config_dir}/pipewire.conf.d"
     mkdir -p "${conf_file}"
-    
+
     # Create the low latency configuration
     local low_latency_conf="${conf_file}/99-low-latency.conf"
     log_info "Creating low latency configuration at ${low_latency_conf}"
-    
+
     cat > "${low_latency_conf}" << 'EOF'
 # Low latency PipeWire configuration
 context.properties = {
@@ -103,17 +103,17 @@ context.objects = [
     }
 ]
 EOF
-    
+
     # Fix permissions
     if [[ -n "${SUDO_USER}" ]]; then
         chown -R "${SUDO_USER}:${SUDO_USER}" "${config_dir}"
     fi
-    
+
     # Create PulseAudio daemon.conf for compatibility
     log_info "Creating compatible PulseAudio configuration"
     local pulse_dir="${user_home}/.config/pulse"
     mkdir -p "${pulse_dir}"
-    
+
     cat > "${pulse_dir}/daemon.conf" << 'EOF'
 # PulseAudio daemon configuration
 high-priority = yes
@@ -129,12 +129,12 @@ default-sample-channels = 2
 default-fragments = 2
 default-fragment-size-msec = 4
 EOF
-    
+
     # Fix permissions
     if [[ -n "${SUDO_USER}" ]]; then
         chown -R "${SUDO_USER}:${SUDO_USER}" "${pulse_dir}"
     fi
-    
+
     # Set PipeWire service to start on boot
     if systemctl --user -q is-enabled pipewire.service 2>/dev/null; then
         log_info "PipeWire service already enabled"
@@ -148,7 +148,7 @@ EOF
             systemctl --user start pipewire.service pipewire-pulse.service
         fi
     fi
-    
+
     set_state "${SCRIPT_NAME}_pipewire_configured"
     log_success "PipeWire configured for low latency audio"
     return 0
@@ -160,16 +160,16 @@ EOF
 
 function configure_realtime_limits() {
     log_step "Configuring Real-time Priorities and Limits"
-    
+
     if check_state "${SCRIPT_NAME}_realtime_limits_configured"; then
         log_info "Real-time limits already configured. Skipping..."
         return 0
     fi
-    
+
     # Configure the limits.conf for real-time audio
     local limits_conf="/etc/security/limits.d/99-audio-limits.conf"
     log_info "Creating audio limits configuration at ${limits_conf}"
-    
+
     cat > "${limits_conf}" << 'EOF'
 # Real-time audio configuration
 # Allow audio group to use higher priority and locked memory
@@ -178,7 +178,7 @@ function configure_realtime_limits() {
 @audio   -  nice       -19
 @audio   -  priority   99
 EOF
-    
+
     # Add current user to audio group if not already in it
     if [[ -n "${SUDO_USER}" ]]; then
         if ! groups "${SUDO_USER}" | grep -q '\baudio\b'; then
@@ -188,7 +188,7 @@ EOF
             log_info "User ${SUDO_USER} is already in audio group"
         fi
     fi
-    
+
     # Configure PAM limits to include our limits
     local pam_limits="/etc/pam.d/common-session"
     if ! grep -q "pam_limits.so" "${pam_limits}"; then
@@ -197,7 +197,7 @@ EOF
     else
         log_info "PAM limits already configured"
     fi
-    
+
     set_state "${SCRIPT_NAME}_realtime_limits_configured"
     log_success "Real-time priorities and limits configured"
     return 0
@@ -209,12 +209,12 @@ EOF
 
 function configure_cpu_for_audio() {
     log_step "Configuring CPU Governor for Audio Performance"
-    
+
     if check_state "${SCRIPT_NAME}_cpu_governor_configured"; then
         log_info "CPU governor already configured. Skipping..."
         return 0
     fi
-    
+
     # Ensure cpufrequtils is installed
     if ! command -v cpufreq-info &> /dev/null; then
         log_info "Installing CPU frequency utilities"
@@ -223,18 +223,18 @@ function configure_cpu_for_audio() {
             # Continue anyway as this is not critical
         fi
     fi
-    
+
     # Create CPU governor configuration
     local governor_conf="/etc/default/cpufrequtils"
     log_info "Setting CPU governor to performance"
-    
+
     cat > "${governor_conf}" << 'EOF'
 # CPU governor configuration for audio work
 GOVERNOR="performance"
 MAX_SPEED=0
 MIN_SPEED=0
 EOF
-    
+
     # Apply the new governor settings
     log_info "Applying CPU governor settings"
     if command -v systemctl &> /dev/null && systemctl list-unit-files | grep -q cpufrequtils; then
@@ -242,11 +242,11 @@ EOF
     else
         service cpufrequtils restart
     fi
-    
+
     # Create a script to set governor at boot
     local governor_script="/usr/local/bin/set-performance-governor.sh"
     log_info "Creating boot script for CPU governor at ${governor_script}"
-    
+
     cat > "${governor_script}" << 'EOF'
 #!/bin/bash
 # Set CPU governor to performance
@@ -254,13 +254,13 @@ for cpu in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor; do
     echo performance > $cpu
 done
 EOF
-    
+
     chmod +x "${governor_script}"
-    
+
     # Create systemd service to run at boot
     local service_file="/etc/systemd/system/cpu-performance-governor.service"
     log_info "Creating systemd service for CPU governor"
-    
+
     cat > "${service_file}" << EOF
 [Unit]
 Description=Set CPU Governor to Performance
@@ -274,12 +274,12 @@ RemainAfterExit=yes
 [Install]
 WantedBy=multi-user.target
 EOF
-    
+
     # Enable and start the service
     systemctl daemon-reload
     systemctl enable cpu-performance-governor.service
     systemctl start cpu-performance-governor.service
-    
+
     set_state "${SCRIPT_NAME}_cpu_governor_configured"
     log_success "CPU governor configured for audio performance"
     return 0
@@ -291,37 +291,37 @@ EOF
 
 function optimize_usb_audio() {
     log_step "Optimizing USB Audio Settings"
-    
+
     if check_state "${SCRIPT_NAME}_usb_audio_optimized"; then
         log_info "USB audio already optimized. Skipping..."
         return 0
     fi
-    
+
     # Configure USB power management for audio devices
     local usb_conf="/etc/modprobe.d/99-audio-usb.conf"
     log_info "Configuring USB power management"
-    
+
     cat > "${usb_conf}" << 'EOF'
 # Disable USB autosuspend for audio devices
 options usbcore autosuspend=-1
 EOF
-    
+
     # Create udev rules for USB audio devices
     local udev_rules="/etc/udev/rules.d/99-audio-device-priority.rules"
     log_info "Creating udev rules for USB audio devices"
-    
+
     cat > "${udev_rules}" << 'EOF'
 # Set high priority for USB audio devices
 SUBSYSTEM=="usb", ATTRS{idVendor}=="*", ATTRS{idProduct}=="*", ATTR{bInterfaceClass}=="01", ATTR{bInterfaceSubClass}=="01", ACTION=="add", RUN+="/usr/bin/ionice -c 1 -n 0 -p $DEVPATH"
 # Set scheduler to deadline for audio devices
 ACTION=="add|change", KERNEL=="sd[a-z]", ATTRS{idVendor}=="*", ATTRS{model}=="*Audio*", ATTR{queue/scheduler}="deadline"
 EOF
-    
+
     # Reload udev rules
     log_info "Reloading udev rules"
     udevadm control --reload-rules
     udevadm trigger
-    
+
     set_state "${SCRIPT_NAME}_usb_audio_optimized"
     log_success "USB audio settings optimized"
     return 0
@@ -333,12 +333,12 @@ EOF
 
 function configure_jack_audio() {
     log_step "Configuring JACK Audio Server"
-    
+
     if check_state "${SCRIPT_NAME}_jack_configured"; then
         log_info "JACK already configured. Skipping..."
         return 0
     fi
-    
+
     # Install JACK and related packages if not already installed
     if ! command -v jackd &> /dev/null; then
         log_info "Installing JACK Audio Server"
@@ -347,21 +347,21 @@ function configure_jack_audio() {
             # Continue anyway as this is not critical
         fi
     fi
-    
+
     local user_home
     if [[ -n "${SUDO_USER}" ]]; then
         user_home=$(getent passwd "${SUDO_USER}" | cut -d: -f6)
     else
         user_home="${HOME}"
     fi
-    
+
     # Create QjackCtl configuration
     local qjackctl_dir="${user_home}/.config/rncbc.org"
     mkdir -p "${qjackctl_dir}"
-    
+
     local qjackctl_conf="${qjackctl_dir}/QjackCtl.conf"
     log_info "Creating QjackCtl configuration at ${qjackctl_conf}"
-    
+
     cat > "${qjackctl_conf}" << 'EOF'
 [Defaults]
 PatchbayPath=
@@ -429,23 +429,23 @@ SeqDriver=
 Dither=0
 Timeout=500
 EOF
-    
+
     # Fix permissions
     if [[ -n "${SUDO_USER}" ]]; then
         chown -R "${SUDO_USER}:${SUDO_USER}" "${qjackctl_dir}"
     fi
-    
+
     # Create JACK configuration file
     local jack_conf="/etc/security/limits.d/95-jack.conf"
     log_info "Creating JACK security limits configuration"
-    
+
     cat > "${jack_conf}" << 'EOF'
 # JACK Audio Connection Kit settings
 # Allow realtime priority for JACK
 @audio   -  rtprio     99
 @audio   -  memlock    unlimited
 EOF
-    
+
     set_state "${SCRIPT_NAME}_jack_configured"
     log_success "JACK Audio Server configured"
     return 0
@@ -457,42 +457,42 @@ EOF
 
 function setup_realtime_audio() {
     log_section "Setting Up Real-time Audio"
-    
+
     # Exit if this script has already been completed successfully
     if check_state "${SCRIPT_NAME}_completed" && [[ "${FORCE_MODE}" != "true" ]]; then
         log_info "Real-time audio has already been configured. Skipping..."
         return 0
     fi
-    
+
     # Update package lists
     log_step "Updating package lists"
     if ! apt_update; then
         log_error "Failed to update package lists"
         return 1
     fi
-    
+
     # Configure PipeWire for low latency
     configure_pipewire_low_latency || log_warning "Failed to configure PipeWire"
-    
+
     # Configure real-time priorities and limits
     configure_realtime_limits || log_warning "Failed to configure real-time limits"
-    
+
     # Configure CPU governor for audio performance
     configure_cpu_for_audio || log_warning "Failed to configure CPU governor"
-    
+
     # Optimize USB audio settings
     optimize_usb_audio || log_warning "Failed to optimize USB audio settings"
-    
+
     # Configure JACK Audio Server
     configure_jack_audio || log_warning "Failed to configure JACK Audio Server"
-    
+
     # Mark as completed
     set_state "${SCRIPT_NAME}_completed"
     log_success "Real-time audio configuration completed successfully"
-    
+
     # Remind user to reboot
     log_warning "A system reboot is required to apply real-time audio settings"
-    
+
     return 0
 }
 

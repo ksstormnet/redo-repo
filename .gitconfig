@@ -1,0 +1,23 @@
+[core]
+    autocrlf = input
+    eol = lf
+    safecrlf = true
+
+[init]
+    defaultBranch = main
+
+[pull]
+    rebase = false
+
+[apply]
+    whitespace = fix
+
+[color]
+    ui = auto
+
+[diff]
+    renamelimit = 0
+    renames = copies
+
+[merge]
+    ff = only
